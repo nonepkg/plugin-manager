@@ -1,14 +1,15 @@
 [tool.poetry]
 name = "nonebot_plugin_manager"
-version = "0.1.0"
+version = "0.1.0.post1"
 description = "Plugin Manager base on import hook"
 authors = ["Jigsaw <j1g5aw@foxmail.com>"]
 license = "MIT"
+readme = "README.md"
 homepage = "https://github.com/Jigsaw111/nonebot_plugin_manager"
 repository = "https://github.com/Jigsaw111/nonebot_plugin_manager"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7.3"
 nonebot2 = "^2.0.0-alpha.11"
 nonebot-adapter-cqhttp = "^2.0.0a11.post2"
 
