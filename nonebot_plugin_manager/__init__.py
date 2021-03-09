@@ -2,6 +2,8 @@ import os
 
 from nonebot.plugin import get_loaded_plugins, Matcher
 from nonebot import on_command
+from nonebot.adapters.cqhttp.permission import GROUP_ADMIN,GROUP_OWNER
+from nonebot.permission import SUPERUSER
 from nonebot.message import run_preprocessor
 from nonebot.adapters.cqhttp import Event, Bot
 from nonebot.typing import T_State
@@ -9,7 +11,7 @@ from nonebot.exception import IgnoredException
 
 DATA_PATH = "data/manager/block_list"
 
-plugin_list = on_command('plugin')
+plugin_list = on_command('plugin',permission=SUPERUSER)
 @plugin_list.handle()
 async def _(bot: Bot, event: Event):
     block_list = get_block_list()
