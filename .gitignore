@@ -1,2 +1,5 @@
-__pycache__
-dist
+*
+!nonebot_plugin_manager/*
+!pyproject.toml
+!README.md
+!LICENSE
