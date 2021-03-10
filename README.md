@@ -1,10 +1,10 @@
-# Plugin Manager
+# Nonebot Plugin Manager
 
 *适用于 [nonebot2](https://github.com/nonebot/nonebot2) 以及 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) 的插件管理器*
 
 [![License](https://img.shields.io/github/license/Jigsaw111/nonebot_plugin_manager)](LICENSE)
-![Python Version](https://img.shields.io/badge/python-3.7+-blue.svg)
-![NoneBot Version](https://img.shields.io/badge/nonebot-2+-red.svg)
+![Python Version](https://img.shields.io/badge/python-3.7.3+-blue.svg)
+![NoneBot Version](https://img.shields.io/badge/nonebot-2.0.0a11+-red.svg)
 ![Pypi Version](https://img.shields.io/pypi/v/nonebot-plugin-manager.svg)
 
 ### 安装
@@ -23,15 +23,22 @@ poetry add nonebot_plugin_manager
 
 ### 开始使用
 
-`.plugin list` 查看插件列表
+**使用前请先确保命令前缀设置为空，否则请在以下命令前加上自己的命令前缀 (默认为 `/` )。**
 
-`.plugin block 插件名` 屏蔽插件
+`npm list` 查看插件列表
 
-`.plugin unblock 插件名` 启用插件
+`npm block 插件名...` 屏蔽插件
+
+`npm unblock 插件名...` 启用插件
+
+`-a,--a` 可选参数，全选插件
+
+`-d,--d` 可选参数，全局管理
 
 ### TO DO
 
-- [ ] 分群插件管理
+- [x] 分群插件管理
+- [ ] 调用 nb-cli 安装卸载插件
 
 <details>
 <summary>展开更多</summary>
@@ -44,6 +51,7 @@ poetry add nonebot_plugin_manager
 
 ### Bug
 
-- 无法停用 Matcher 以外的功能。
+- [ ] 无法停用 Matcher 以外的功能（也就是说无法屏蔽主动发消息的插件，例如 Harukabot ）。
+- [ ] 目前任何人都可以管理插件
 
 </details>
