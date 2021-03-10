@@ -52,6 +52,6 @@ poetry add nonebot_plugin_manager
 ### Bug
 
 - [ ] 无法停用 Matcher 以外的功能（也就是说无法屏蔽主动发消息的插件，例如 Harukabot ）。
-- [ ] 目前任何人都可以管理插件
+- [x] 目前任何人都可以管理插件
 
 </details>

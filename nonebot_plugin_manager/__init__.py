@@ -31,18 +31,19 @@ block_parser = subparsers.add_parser("block", help="block plugin")
 block_parser.add_argument("plugins", nargs="*")
 block_parser.add_argument("-d", "--default", action="store_true")
 block_parser.add_argument("-a", "--all", action="store_true")
-block_parser.add_argument("-g", "--group")
+block_parser.add_argument("-g", "--group", action="store", type=int)
 block_parser.set_defaults(command="block")
 
 unblock_parser = subparsers.add_parser("unblock", help="unblock plugin")
 unblock_parser.add_argument("plugins", nargs="*")
 unblock_parser.add_argument("-d", "--default", action="store_true")
-block_parser.add_argument("-g", "--group")
+unblock_parser.add_argument("-a", "--all", action="store_true")
+unblock_parser.add_argument("-g", "--group", action="store", type=int)
 unblock_parser.set_defaults(command="unblock")
 
 list_parser = subparsers.add_parser("list", help="show plugin list")
 list_parser.add_argument("-d", "--default", action="store_true")
-list_parser.add_argument("-g", "--group")
+list_parser.add_argument("-g", "--group", action="store", type=int)
 list_parser.set_defaults(command="list")
 
 plugin_manager = on_shell_command("npm", parser=parser)
@@ -54,11 +55,21 @@ async def _(bot: Bot, event: Event, state: T_State):
     plugin_list = get_plugin_list()
     message = ""
 
-    if state["args"].default:
-        group_id = 0
-        message += "全局"
-
     if state["args"].command == "list":
+        if state["args"].default:
+            if str(event.user_id) in bot.config.superusers:
+                group_id = 0
+                message += "全局"
+            else:
+                plugin_manager.finish("权限不足")
+
+        if state["args"].group:
+            if str(event.user_id) in bot.config.superusers:
+                group_id = state["args"].group
+                message += f'群 {state["args"].group} '
+            else:
+                plugin_manager.finish("权限不足")
+
         setting = load_setting(group_id)
         message += "插件列表如下："
         for plugin in plugin_list:
@@ -66,6 +77,23 @@ async def _(bot: Bot, event: Event, state: T_State):
         await plugin_manager.finish(message)
 
     if state["args"].command == "block":
+        if group_id and event.sender.role == "member":
+            await plugin_manager.finish("权限不足")
+
+        if state["args"].default:
+            if str(event.user_id) in bot.config.superusers:
+                group_id = 0
+                message += "全局"
+            else:
+                await plugin_manager.finish("权限不足")
+
+        if state["args"].group:
+            if str(event.user_id) in bot.config.superusers:
+                group_id = state["args"].group
+                message += f'群 {state["args"].group} '
+            else:
+                await plugin_manager.finish("权限不足")
+
         setting = load_setting(group_id)
         message += "结果如下："
         for plugin in state["args"].plugins if not state["args"].all else plugin_list:
@@ -82,8 +110,25 @@ async def _(bot: Bot, event: Event, state: T_State):
         await plugin_manager.finish(message)
 
     if state["args"].command == "unblock":
+        if group_id and event.sender.role == "member":
+            await plugin_manager.finish("权限不足")
+
+        if state["args"].default:
+            if str(event.user_id) in bot.config.superusers:
+                group_id = 0
+                message += "全局"
+            else:
+                await plugin_manager.finish("权限不足")
+
+        if state["args"].group:
+            if str(event.user_id) in bot.config.superusers:
+                group_id = state["args"].group
+                message += f'群 {state["args"].group}'
+            else:
+                await plugin_manager.finish("权限不足")
+
         setting = load_setting(group_id)
-        message = "结果如下："
+        message += "结果如下："
         for plugin in state["args"].plugins if not state["args"].all else plugin_list:
             message += "\n"
             if plugin in plugin_list:
