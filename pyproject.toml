@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "nonebot_plugin_manager"
-version = "0.2.1"
-description = "Plugin Manager base on import hook"
+version = "0.3.0"
+description = "Nonebot Plugin Manager base on import hook"
 authors = ["Jigsaw <j1g5aw@foxmail.com>"]
 license = "MIT"
 readme = "README.md"

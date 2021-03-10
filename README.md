@@ -27,13 +27,15 @@ poetry add nonebot_plugin_manager
 
 `npm list` 查看插件列表
 
-`npm block 插件名...` 屏蔽插件
+`npm block 插件名...` 屏蔽插件 （仅群管及超级用户可用）
 
-`npm unblock 插件名...` 启用插件
+`npm unblock 插件名...` 启用插件 （仅群管及超级用户可用）
 
-`-a,--a` 可选参数，全选插件
+`-a, --all` 可选参数，全选插件 （仅群管及超级用户可用）
 
-`-d,--d` 可选参数，全局管理
+`-d, --default` 可选参数，管理默认设置 （仅超级用户可用）
+
+`-g, --group group_id` 可选参数，管理群设置（仅超级用户可用）
 
 ### TO DO
 
