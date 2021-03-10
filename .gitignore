@@ -1,5 +1,7 @@
-*
-!nonebot_plugin_manager/*
+/*
+!/nonebot_plugin_manager/
+__pycache__
 !pyproject.toml
 !README.md
 !LICENSE
+!.gitignore
