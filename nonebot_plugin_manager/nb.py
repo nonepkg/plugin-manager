@@ -22,7 +22,7 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
 
     group_id = _get_group_id(event)
 
-    setting = load_setting[group_id]
+    setting = load_setting(group_id)
     if plugin not in setting:
         setting = load_setting(0)
 

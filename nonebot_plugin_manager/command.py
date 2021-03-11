@@ -44,6 +44,10 @@ def command_block(
     is_admin: bool,
     is_superuser: bool,
 ) -> str:
+
+    if not is_admin and not is_superuser:
+        return "管理插件需要群管理员权限！"
+
     message = ""
 
     if args.default:
@@ -62,7 +66,7 @@ def command_block(
 
     setting = load_setting(group_id)
     message += "结果如下："
-    for plugin in args.plugins:
+    for plugin in args.plugins if not args.all else plugin_list:
         message += "\n"
         if plugin in plugin_list:
             if not plugin in setting or setting[plugin]:
@@ -85,6 +89,9 @@ def command_unblock(
 ) -> str:
     message = ""
 
+    if not is_admin and not is_superuser:
+        return "管理插件需要群管理员权限！"
+
     if args.default:
         if is_superuser:
             group_id = 0
@@ -101,7 +108,7 @@ def command_unblock(
 
     setting = load_setting(group_id)
     message += "结果如下："
-    for plugin in args.plugins:
+    for plugin in args.plugins if not args.all else plugin_list:
         message += "\n"
         if plugin in plugin_list:
             if not plugin in setting or not setting[plugin]:
