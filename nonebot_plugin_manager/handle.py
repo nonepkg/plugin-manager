@@ -1,12 +1,13 @@
 from argparse import Namespace
+from nonebot.adapters.cqhttp import MessageSegment
 
-from .setting import load_setting, update_setting
+from . import data
 
 
-def command_list(
+def handle_list(
     args: Namespace,
-    plugin_list: list,
-    group_id: int,
+    plugin_list: dict,
+    group_id: str,
     is_admin: bool,
     is_superuser: bool,
 ) -> str:
@@ -26,21 +27,19 @@ def command_list(
         else:
             return "获取指定群插件列表需要超级用户权限！"
 
-    default_setting = load_setting(0)
-    setting = load_setting(group_id)
     message += "插件列表如下："
     for plugin in plugin_list:
-        if setting is not None and plugin in setting:
-            message += f'\n[{"o" if setting[plugin] else "x"}] {plugin}'
+        if group_id in plugin_list[plugin]:
+            message += f'\n[{"o" if plugin_list[plugin][group_id] else "x"}] {plugin}'
         else:
-            message += f'\n[{"o" if default_setting[plugin] else "x"}] {plugin}'
+            message += f'\n[{"o" if plugin_list[plugin]["0"] else "x"}] {plugin}'
     return message
 
 
-def command_block(
+def handle_block(
     args: Namespace,
-    plugin_list: list,
-    group_id: int,
+    plugin_list: dict,
+    group_id: str,
     is_admin: bool,
     is_superuser: bool,
 ) -> str:
@@ -64,26 +63,25 @@ def command_block(
         else:
             return "管理指定群插件需要超级用户权限！"
 
-    setting = load_setting(group_id)
     message += "结果如下："
     for plugin in args.plugins if not args.all else plugin_list:
         message += "\n"
         if plugin in plugin_list:
-            if not plugin in setting or setting[plugin]:
-                setting[plugin] = False
+            if not group_id in plugin_list[plugin] or plugin_list[plugin][group_id]:
+                plugin_list[plugin][group_id] = False
                 message += f"插件{plugin}屏蔽成功！"
             else:
                 message += f"插件{plugin}已经屏蔽！"
         else:
             message += f"插件{plugin}不存在！"
-    update_setting(group_id, setting)
+    data.dump(plugin_list)
     return message
 
 
-def command_unblock(
+def handle_unblock(
     args: Namespace,
-    plugin_list: list,
-    group_id: int,
+    plugin_list: dict,
+    group_id: str,
     is_admin: bool,
     is_superuser: bool,
 ) -> str:
@@ -106,17 +104,24 @@ def command_unblock(
         else:
             return "管理指定群插件需要超级用户权限！"
 
-    setting = load_setting(group_id)
     message += "结果如下："
     for plugin in args.plugins if not args.all else plugin_list:
         message += "\n"
         if plugin in plugin_list:
-            if not plugin in setting or not setting[plugin]:
-                setting[plugin] = True
+            if not group_id in plugin_list[plugin] or not plugin_list[plugin][group_id]:
+                plugin_list[plugin][group_id] = True
                 message += f"插件{plugin}启用成功！"
             else:
                 message += f"插件{plugin}已经启用！"
         else:
             message += f"插件{plugin}不存在！"
-    update_setting(group_id, setting)
+    data.dump(plugin_list)
     return message
+
+
+def handle_install():
+    pass
+
+
+def handle_uninstall():
+    pass
