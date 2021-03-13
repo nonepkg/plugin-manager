@@ -1,7 +1,7 @@
 from argparse import Namespace
-from nonebot.adapters.cqhttp import MessageSegment
 
 from . import data
+from .plugin import _get_plugins
 
 
 def handle_list(
@@ -12,6 +12,19 @@ def handle_list(
     is_superuser: bool,
 ) -> str:
     message = ""
+
+    if args.store:
+        if is_superuser:
+            message += "商店插件列表如下："
+            store_plugin_list = _get_plugins()
+            for i in range(len(store_plugin_list)):
+                if store_plugin_list[i]["id"] in plugin_list:
+                    message += f'\n[o] {store_plugin_list[i]["id"]}'
+                else:
+                    message += f'\n[x] {store_plugin_list[i]["id"]}'
+            return message
+        else:
+            return "获取商店插件列表需要超级用户权限！"
 
     if args.default:
         if is_superuser:
