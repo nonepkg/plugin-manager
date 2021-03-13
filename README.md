@@ -9,33 +9,84 @@
 
 ### 安装
 
-* 使用nb-cli（推荐）  
+#### 从 PyPI 安装（推荐）
+
+- 使用 nb-cli  
 
 ```bash
 nb plugin install nonebot_plugin_manager
 ```
 
-* 使用poetry
+- 使用 poetry
 
 ```bash
 poetry add nonebot_plugin_manager
+```
+
+- 使用 pip
+
+```bash
+pip install nonebot_plugin_manager
+```
+
+#### 从 GitHub 安装（不推荐）
+
+```bash
+git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 ```
 
 ### 使用
 
 **使用前请先确保命令前缀为空，否则请在以下命令前加上命令前缀 (默认为 `/` )。**
 
-`npm list` 查看插件列表
+- `npm list` 查看插件列表
+- - `-s, --store` 可选参数，查看 nonebot 插件商店（仅超级用户可用）
+- - `-d, --default` 可选参数，管理默认设置（仅超级用户可用）
+- - `-g group_id, --group group_id` 可选参数，管理群设置（仅超级用户可用）
 
-`npm block 插件名...` 屏蔽插件 （仅群管及超级用户可用）
+- `npm block 插件名...` 屏蔽插件 （仅群管及超级用户可用）
+- - `-a, --all` 可选参数，全选插件
+- - `-d, --default` 可选参数，管理默认设置 （仅超级用户可用）
+- - `-g group_id, --group group_id` 可选参数，管理群设置（仅超级用户可用）
 
-`npm unblock 插件名...` 启用插件 （仅群管及超级用户可用）
+- `npm unblock 插件名...` 启用插件 （仅群管及超级用户可用）
+- - `-a, --all` 可选参数，全选插件
+- - `-d, --default` 可选参数，管理默认设置 （仅超级用户可用）
+- - `-g group_id, --group group_id` 可选参数，管理群设置（仅超级用户可用）
 
-`-a, --all` 可选参数，全选插件 （仅群管及超级用户可用）
+- `npm install 插件名...` 安装插件 （仅超级用户可用）
+- - `-i index, --index index` 指定 PyPI 源
 
-`-d, --default` 可选参数，管理默认设置 （仅超级用户可用）
+- `npm update 插件名...` 更新插件 （仅超级用户可用）
+- - `-i index, --index index` 指定 PyPI 源
+- - `-a, --all` 可选参数，全选插件
 
-`-g group_id, --group group_id` 可选参数，管理群设置（仅超级用户可用）
+- `npm uninstall 插件名...` 卸载插件 （仅超级用户可用）
+- - `-a, --all` 可选参数，全选插件
+
+### 导出
+
+```python
+from nonebot import require
+
+export = require("nonebot_plugin_manager")
+
+# 加载插件列表
+export.load_()
+# 保存插件列表
+export.dump_()
+```
+
+**示例**
+
+例如我有一个插件需要有自己的开关功能，那么我们就可以通过导出来实现这一点
+
+```python
+# 启用插件
+plugin_list=export.load_()
+plugin_list['nodice'].update({str(kargs["group_id"]):True})
+export.dump_(plugin_list)
+```
 
 ### Q&A
 
@@ -46,6 +97,10 @@ poetry add nonebot_plugin_manager
 - **自造 Rule 不是更好？**  
   Rule 当然更好且更有效率，但是 Rule 是一种**侵入式**的插件管理方式，需要用户自行修改其他插件，这对于管理从 pypi 安装的插件来说相对复杂。而使用本插件，你不需要修改其他插件的任何内容，更符合插件之间**松耦合**的设计原则。
 
+### Thanks
+
+[nonebot/nb-cli](https://github.com/nonebot/nb-cli)
+
 <details>
 <summary>展开更多</summary>
 
@@ -54,6 +109,8 @@ poetry add nonebot_plugin_manager
 使用 `run_preprocessor` 装饰器，在 Matcher 运行之前检测其所属的 Plugin 判断是否打断。
 
 事实上 Nonebot 还是加载了插件，所以只能算是**屏蔽**而非**卸载**。
+
+当然，你也可以使用 `npm uninstall` 命令来真正卸载插件，但我不建议你这样做，因为该命令将会重启 Nonebot 。
 
 ### TO DO
 
@@ -64,5 +121,12 @@ poetry add nonebot_plugin_manager
 
 - [ ] 无法停用 Matcher 以外的功能（也就是说无法屏蔽主动发消息的插件，例如 Harukabot ）。
 - [x] 目前任何人都可以屏蔽/启用插件
+
+### Changelog
+
+- 210312，重构 0.3.0，`setting.json` 重命名为 `plugin_list.json`，结构改为 `plugin:{group_id:true,group_id:false}`。
+- 210310，0.3.0 完工，将__init__.py分离成 setting,command,nb 三个文件。
+- 210310，0.2.0 完工，命令格式改为 shelllike，使用 `setting.json` 作为配置文件，基本结构为 `group_id:{plugin:true,plugin:false}` 。
+- 210307，0.1.0 完工，上架插件商店。确定了通过 `run_preprocessor` 屏蔽 Matcher 的基本原理，使用 `block_list` 作为全局设置（即只屏蔽 block_list 中的插件）
 
 </details>

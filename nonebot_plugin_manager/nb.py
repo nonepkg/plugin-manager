@@ -1,12 +1,16 @@
-from nonebot.plugin import get_loaded_plugins
-from nonebot.plugin import Matcher, on_shell_command
+from nonebot.plugin import Matcher, on_shell_command, get_loaded_plugins, export
 from nonebot.typing import T_State
 from nonebot.exception import IgnoredException
 from nonebot.message import run_preprocessor
 from nonebot.adapters.cqhttp import Event, Bot, GroupMessageEvent
 
 from . import data
-from .parser import *
+from .parser import parser
+
+export = export()
+
+export.load_ = data.load
+export.dump_ = data.dump
 
 plugin_manager = on_shell_command(
     "npm", aliases=set("plugin"), parser=parser, priority=1

@@ -132,9 +132,31 @@ def handle_unblock(
     return message
 
 
-def handle_install():
+def handle_install(
+    args: Namespace,
+    plugin_list: dict,
+    group_id: str,
+    is_admin: bool,
+    is_superuser: bool,
+) -> str:
     pass
 
 
-def handle_uninstall():
+def handle_update(
+    args: Namespace,
+    plugin_list: dict,
+    group_id: str,
+    is_admin: bool,
+    is_superuser: bool,
+) -> str:
+    pass
+
+
+def handle_uninstall(
+    args: Namespace,
+    plugin_list: dict,
+    group_id: str,
+    is_admin: bool,
+    is_superuser: bool,
+) -> str:
     pass
