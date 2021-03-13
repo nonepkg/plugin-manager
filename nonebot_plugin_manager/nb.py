@@ -7,11 +7,12 @@ from nonebot.adapters.cqhttp import Event, Bot, GroupMessageEvent
 from . import data
 from .parser import parser
 
+# 导出给其他插件使用
 export = export()
-
 export.load_ = data.load
 export.dump_ = data.dump
 
+# 注册 shell_like 事件响应器
 plugin_manager = on_shell_command(
     "npm", aliases=set("plugin"), parser=parser, priority=1
 )
@@ -44,10 +45,12 @@ async def _(bot: Bot, event: Event, state: T_State):
     is_admin = _is_admin(event)
     is_superuser = _is_superuser(bot, event)
 
-    if args.handle:
+    if hasattr(args, "handle"):
         await plugin_manager.finish(
             args.handle(args, plugin_list, group_id, is_admin, is_superuser)
         )
+    else:
+        await plugin_manager.finish(parser.format_help())
 
 
 # 获取插件列表，并自动排除本插件
