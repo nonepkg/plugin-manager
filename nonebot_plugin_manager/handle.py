@@ -1,7 +1,8 @@
+import httpx # 权宜之计，之后与 httpx 有关的功能会移动到 plugin.py
 from argparse import Namespace
 
 from . import data
-from .plugin import _get_plugins
+from .plugin import get_store_plugin_list
 
 
 def handle_list(
@@ -16,12 +17,12 @@ def handle_list(
     if args.store:
         if is_superuser:
             message += "商店插件列表如下："
-            store_plugin_list = _get_plugins()
-            for i in range(len(store_plugin_list)):
-                if store_plugin_list[i]["id"] in plugin_list:
-                    message += f'\n[o] {store_plugin_list[i]["id"]}'
+            store_plugin_list = get_store_plugin_list()
+            for plugin in store_plugin_list:
+                if plugin in plugin_list or plugin == "nonebot_plugin_manager":
+                    message += f"\n[o] {plugin}"
                 else:
-                    message += f'\n[x] {store_plugin_list[i]["id"]}'
+                    message += f"\n[x] {plugin}"
             return message
         else:
             return "获取商店插件列表需要超级用户权限！"
@@ -130,6 +131,30 @@ def handle_unblock(
             message += f"插件{plugin}不存在！"
     data.dump(plugin_list)
     return message
+
+
+def handle_info(
+    args: Namespace,
+    plugin_list: dict,
+    group_id: str,
+    is_admin: bool,
+    is_superuser: bool,
+) -> str:
+
+    if not is_admin and not is_superuser:
+        return "管理插件需要群管理员权限！"
+
+    store_plugin_list = get_store_plugin_list()
+    if args.plugin in store_plugin_list:
+        plugin = store_plugin_list[args.plugin]
+        return f"""ID: {plugin["id"]}
+Name: {plugin["name"]}
+Description: {plugin["desc"]}
+Version: {httpx.get('https://pypi.org/pypi/'+plugin["link"]+'/json').json()["info"]['version']}
+Author: {plugin["author"]}
+Repo: https://github.com/{plugin["repo"]}"""
+    else:
+        return "查无此插件！"
 
 
 def handle_install(

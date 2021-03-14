@@ -54,6 +54,10 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 - - `-d, --default` 可选参数，管理默认设置 （仅超级用户可用）
 - - `-g group_id, --group group_id` 可选参数，管理群设置（仅超级用户可用）
 
+- `npm info 插件名` 查询插件信息 （仅群管及超级用户可用）
+
+*以下功能尚未实现*
+
 - `npm install 插件名...` 安装插件 （仅超级用户可用）
 - - `-i index, --index index` 指定 PyPI 源
 
@@ -72,14 +76,15 @@ from nonebot import require
 export = require("nonebot_plugin_manager")
 
 # 加载插件列表
-export.load_()
+export.load()
+
 # 保存插件列表
-export.dump_()
+export.dump()
 ```
 
 **示例**
 
-例如我有一个插件需要有自己的开关功能，那么我们就可以通过导出来实现这一点
+例如我有一个插件需要有自己的开关，那么我们就可以通过导出来实现这一功能（但是我并不推荐使用这种方法，npm 自带的指令已经足够简便，无须在其他插件中多此一举）。
 
 ```python
 # 启用插件
@@ -100,6 +105,7 @@ export.dump_(plugin_list)
 ### Thanks
 
 [nonebot/nb-cli](https://github.com/nonebot/nb-cli)
+
 
 <details>
 <summary>展开更多</summary>
@@ -124,6 +130,8 @@ export.dump_(plugin_list)
 
 ### Changelog
 
+- 210314，修复 `npm list`  的 --group 参数不起作用的 bug，实现查询插件信息。
+- 210313，实现爬取插件商店列表，实现 -h 参数，新增 export 导出给其他插件。
 - 210312，重构 0.3.0，`setting.json` 重命名为 `plugin_list.json`，结构改为 `plugin:{group_id:true,group_id:false}`。
 - 210310，0.3.0 完工，将__init__.py分离成 setting,command,nb 三个文件。
 - 210310，0.2.0 完工，命令格式改为 shelllike，使用 `setting.json` 作为配置文件，基本结构为 `group_id:{plugin:true,plugin:false}` 。

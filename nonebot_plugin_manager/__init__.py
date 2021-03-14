@@ -9,12 +9,12 @@ from .parser import parser
 
 # 导出给其他插件使用
 export = export()
-export.load_ = data.load
-export.dump_ = data.dump
+export.load = data.load
+export.dump = data.dump
 
 # 注册 shell_like 事件响应器
 plugin_manager = on_shell_command(
-    "npm", aliases=set("plugin"), parser=parser, priority=1
+    "npm", parser=parser, priority=1
 )
 
 # 在 Matcher 运行前检测其是否启用
@@ -66,10 +66,11 @@ def _get_group_id(event: Event) -> str:
 
 
 def _is_admin(event: Event) -> bool:
-    if isinstance(event, GroupMessageEvent):
-        return event.sender.role in ["admin", "owner"]
-    else:
-        return False
+    return (
+        event.sender.role in ["admin", "owner"]
+        if isinstance(event, GroupMessageEvent)
+        else False
+    )
 
 
 def _is_superuser(bot: Bot, event: Event) -> bool:

@@ -35,6 +35,10 @@ unblock_parser.add_argument(
 unblock_parser.add_argument("-g", "--group", action="store", help="set in group")
 unblock_parser.set_defaults(handle=handle_unblock)
 
+info_parser = subparsers.add_parser("info", help="show plugin info")
+info_parser.add_argument("plugin", help="plugins you want to know")
+info_parser.set_defaults(handle=handle_info)
+
 install_parser = subparsers.add_parser("install", help="install plugin")
 install_parser.add_argument("plugins", nargs="*", help="plugins you want to install")
 install_parser.add_argument("-i", "--index", action="store", help="point to a mirror")
