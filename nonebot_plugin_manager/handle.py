@@ -28,7 +28,7 @@ def handle_list(
 
     if args.default:
         if is_superuser:
-            group_id = 0
+            group_id = "0"
             message += "默认"
         else:
             return "获取默认插件列表需要超级用户权限！"
@@ -64,7 +64,7 @@ def handle_block(
 
     if args.default:
         if is_superuser:
-            group_id = 0
+            group_id = "0"
             message += "默认"
         else:
             return "管理默认插件需要超级用户权限！"
@@ -105,7 +105,7 @@ def handle_unblock(
 
     if args.default:
         if is_superuser:
-            group_id = 0
+            group_id = "0"
             message += "默认"
         else:
             return "管理默认插件需要超级用户权限！"

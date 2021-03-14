@@ -49,8 +49,6 @@ async def _(bot: Bot, event: Event, state: T_State):
         await plugin_manager.finish(
             args.handle(args, plugin_list, group_id, is_admin, is_superuser)
         )
-    else:
-        await plugin_manager.finish(parser.format_help())
 
 
 # 获取插件列表，并自动排除本插件
