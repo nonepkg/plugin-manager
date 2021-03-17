@@ -1,13 +1,11 @@
-import httpx # 权宜之计，之后与 httpx 有关的功能会移动到 plugin.py
 from argparse import Namespace
 
-from . import data
-from .plugin import get_store_plugin_list
+from .data import *
+from .plugin import get_plugin_info, get_store_plugin_list
 
 
 def handle_list(
     args: Namespace,
-    plugin_list: dict,
     group_id: str,
     is_admin: bool,
     is_superuser: bool,
@@ -16,14 +14,7 @@ def handle_list(
 
     if args.store:
         if is_superuser:
-            message += "商店插件列表如下："
-            store_plugin_list = get_store_plugin_list()
-            for plugin in store_plugin_list:
-                if plugin in plugin_list or plugin == "nonebot_plugin_manager":
-                    message += f"\n[o] {plugin}"
-                else:
-                    message += f"\n[x] {plugin}"
-            return message
+            return store_pulgin_list(get_store_plugin_list())
         else:
             return "获取商店插件列表需要超级用户权限！"
 
@@ -41,18 +32,12 @@ def handle_list(
         else:
             return "获取指定群插件列表需要超级用户权限！"
 
-    message += "插件列表如下："
-    for plugin in plugin_list:
-        if group_id in plugin_list[plugin]:
-            message += f'\n[{"o" if plugin_list[plugin][group_id] else "x"}] {plugin}'
-        else:
-            message += f'\n[{"o" if plugin_list[plugin]["0"] else "x"}] {plugin}'
+    message += plugin_list(group_id)
     return message
 
 
 def handle_block(
     args: Namespace,
-    plugin_list: dict,
     group_id: str,
     is_admin: bool,
     is_superuser: bool,
@@ -77,24 +62,12 @@ def handle_block(
         else:
             return "管理指定群插件需要超级用户权限！"
 
-    message += "结果如下："
-    for plugin in args.plugins if not args.all else plugin_list:
-        message += "\n"
-        if plugin in plugin_list:
-            if not group_id in plugin_list[plugin] or plugin_list[plugin][group_id]:
-                plugin_list[plugin][group_id] = False
-                message += f"插件{plugin}屏蔽成功！"
-            else:
-                message += f"插件{plugin}已经屏蔽！"
-        else:
-            message += f"插件{plugin}不存在！"
-    data.dump(plugin_list)
+    message += block_plugin(group_id, *args.plugins)
     return message
 
 
 def handle_unblock(
     args: Namespace,
-    plugin_list: dict,
     group_id: str,
     is_admin: bool,
     is_superuser: bool,
@@ -118,48 +91,25 @@ def handle_unblock(
         else:
             return "管理指定群插件需要超级用户权限！"
 
-    message += "结果如下："
-    for plugin in args.plugins if not args.all else plugin_list:
-        message += "\n"
-        if plugin in plugin_list:
-            if not group_id in plugin_list[plugin] or not plugin_list[plugin][group_id]:
-                plugin_list[plugin][group_id] = True
-                message += f"插件{plugin}启用成功！"
-            else:
-                message += f"插件{plugin}已经启用！"
-        else:
-            message += f"插件{plugin}不存在！"
-    data.dump(plugin_list)
+    message += unblock_plugin(group_id, *args.plugins)
     return message
 
 
 def handle_info(
     args: Namespace,
-    plugin_list: dict,
     group_id: str,
     is_admin: bool,
     is_superuser: bool,
 ) -> str:
 
     if not is_admin and not is_superuser:
-        return "管理插件需要群管理员权限！"
+        return "管理插件需要超级权限！"
 
-    store_plugin_list = get_store_plugin_list()
-    if args.plugin in store_plugin_list:
-        plugin = store_plugin_list[args.plugin]
-        return f"""ID: {plugin["id"]}
-Name: {plugin["name"]}
-Description: {plugin["desc"]}
-Version: {httpx.get('https://pypi.org/pypi/'+plugin["link"]+'/json').json()["info"]['version']}
-Author: {plugin["author"]}
-Repo: https://github.com/{plugin["repo"]}"""
-    else:
-        return "查无此插件！"
+    return get_plugin_info(args.plugin)
 
 
 def handle_install(
     args: Namespace,
-    plugin_list: dict,
     group_id: str,
     is_admin: bool,
     is_superuser: bool,
@@ -169,7 +119,6 @@ def handle_install(
 
 def handle_update(
     args: Namespace,
-    plugin_list: dict,
     group_id: str,
     is_admin: bool,
     is_superuser: bool,
@@ -179,7 +128,6 @@ def handle_update(
 
 def handle_uninstall(
     args: Namespace,
-    plugin_list: dict,
     group_id: str,
     is_admin: bool,
     is_superuser: bool,

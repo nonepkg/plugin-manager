@@ -39,22 +39,22 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 
 **使用前请先确保命令前缀为空，否则请在以下命令前加上命令前缀 (默认为 `/` )。**
 
-- `npm list` 查看插件列表
-- - `-s, --store` 可选参数，查看 nonebot 插件商店（仅超级用户可用）
+- `npm list` 查看当前群插件列表
+- - `-s, --store` 可选参数，查看 Nonebot 插件商店（仅超级用户可用）
 - - `-d, --default` 可选参数，管理默认设置（仅超级用户可用）
-- - `-g group_id, --group group_id` 可选参数，管理群设置（仅超级用户可用）
+- - `-g group_id, --group group_id` 可选参数，管理指定群设置（仅超级用户可用）
 
-- `npm block 插件名...` 屏蔽插件 （仅群管及超级用户可用）
+- `npm block 插件名...` 屏蔽当前群插件 （仅群管及超级用户可用）
 - - `-a, --all` 可选参数，全选插件
 - - `-d, --default` 可选参数，管理默认设置 （仅超级用户可用）
-- - `-g group_id, --group group_id` 可选参数，管理群设置（仅超级用户可用）
+- - `-g group_id, --group group_id` 可选参数，管理指定群设置（仅超级用户可用）
 
-- `npm unblock 插件名...` 启用插件 （仅群管及超级用户可用）
+- `npm unblock 插件名...` 启用当前群插件 （仅群管及超级用户可用）
 - - `-a, --all` 可选参数，全选插件
 - - `-d, --default` 可选参数，管理默认设置 （仅超级用户可用）
-- - `-g group_id, --group group_id` 可选参数，管理群设置（仅超级用户可用）
+- - `-g group_id, --group group_id` 可选参数，管理指定群设置（仅超级用户可用）
 
-- `npm info 插件名` 查询插件信息 （仅群管及超级用户可用）
+- `npm info 插件名` 查询插件信息 （仅超级用户可用）
 
 *以下功能尚未实现*
 
@@ -75,22 +75,9 @@ from nonebot import require
 
 export = require("nonebot_plugin_manager")
 
-# 加载插件列表
-export.load()
-
-# 保存插件列表
-export.dump()
-```
-
-**示例**
-
-例如我有一个插件需要有自己的开关，那么我们就可以通过导出来实现这一功能（但是我并不推荐使用这种方法，npm 自带的指令已经足够简便，无须在其他插件中多此一举）。
-
-```python
-# 启用插件
-plugin_list=export.load_()
-plugin_list['nodice'].update({str(kargs["group_id"]):True})
-export.dump_(plugin_list)
+# 在指定群聊中启用/禁用插件
+export.block_plugins(group_id, *plugins)
+export.unblock_plugins(group_id, *plugins)
 ```
 
 ### Q&A
@@ -130,6 +117,7 @@ export.dump_(plugin_list)
 
 ### Changelog
 
+- 210317，调整项目结构，将绝大多数数据处理操作移至 data，handle 只负责调用；修改 export，不再对其他插件暴露底层接口。
 - 210314，修复 `npm list`  的 --group 参数不起作用的 bug，实现查询插件信息。
 - 210313，实现爬取插件商店列表，实现 -h 参数，新增 export 导出给其他插件。
 - 210312，重构 0.3.0，`setting.json` 重命名为 `plugin_list.json`，结构改为 `plugin:{group_id:true,group_id:false}`。

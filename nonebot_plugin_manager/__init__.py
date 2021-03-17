@@ -4,18 +4,16 @@ from nonebot.exception import IgnoredException
 from nonebot.message import run_preprocessor
 from nonebot.adapters.cqhttp import Event, Bot, GroupMessageEvent
 
-from . import data
-from .parser import parser
+from .data import block_plugin, unblock_plugin, auto_update_plugin_list
+from .parser import npm_parser
 
 # 导出给其他插件使用
 export = export()
-export.load = data.load
-export.dump = data.dump
+export.block_plugin = block_plugin
+export.unblock_plugin = unblock_plugin
 
 # 注册 shell_like 事件响应器
-plugin_manager = on_shell_command(
-    "npm", parser=parser, priority=1
-)
+plugin_manager = on_shell_command("npm", parser=npm_parser, priority=1)
 
 # 在 Matcher 运行前检测其是否启用
 @run_preprocessor
@@ -23,7 +21,7 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
     plugin = matcher.module
     group_id = _get_group_id(event)
     loaded_plugin_list = _get_loaded_plugin_list()
-    plugin_list = data.update(data.load(), loaded_plugin_list)
+    plugin_list = auto_update_plugin_list(loaded_plugin_list)
 
     # 无视本插件的 Mathcer
     if plugin == "nonebot_plugin_manager":
@@ -40,15 +38,12 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
 @plugin_manager.handle()
 async def _(bot: Bot, event: Event, state: T_State):
     args = state["args"]
-    plugin_list = data.load()
     group_id = _get_group_id(event)
     is_admin = _is_admin(event)
     is_superuser = _is_superuser(bot, event)
 
     if hasattr(args, "handle"):
-        await plugin_manager.finish(
-            args.handle(args, plugin_list, group_id, is_admin, is_superuser)
-        )
+        await plugin_manager.finish(args.handle(args, group_id, is_admin, is_superuser))
 
 
 # 获取插件列表，并自动排除本插件
