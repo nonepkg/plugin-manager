@@ -4,13 +4,20 @@ from nonebot.exception import IgnoredException
 from nonebot.message import run_preprocessor
 from nonebot.adapters.cqhttp import Event, Bot, GroupMessageEvent
 
-from .data import block_plugin, unblock_plugin, auto_update_plugin_list
+from .data import (
+    block_plugin,
+    unblock_plugin,
+    get_group_plugin_list,
+    auto_update_plugin_list,
+)
 from .parser import npm_parser
 
 # 导出给其他插件使用
 export = export()
 export.block_plugin = block_plugin
 export.unblock_plugin = unblock_plugin
+export.unblock_plugin = unblock_plugin
+export.get_group_plugin_list = get_group_plugin_list
 
 # 注册 shell_like 事件响应器
 plugin_manager = on_shell_command("npm", parser=npm_parser, priority=1)

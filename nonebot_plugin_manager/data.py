@@ -1,23 +1,40 @@
 import json
+import httpx
 from pathlib import Path
 
 _DATA_PATH = Path() / "data" / "manager" / "plugin_list.json"
 
 
-def plugin_list(group_id):
+def get_store_plugin_info(plugin: str) -> str:
+    store_plugin_list = _get_store_plugin_list()
+    if plugin in store_plugin_list:
+        plugin = store_plugin_list[plugin]
+        return (
+            f"ID: {plugin['id']}\n"
+            f"Name: {plugin['name']}\n"
+            f"Description: {plugin['desc']}\n"
+            f"Version: {httpx.get('https://pypi.org/pypi/'+plugin['link']+'/json').json()['info']['version']}\n"
+            f"Author: {plugin['author']}\n"
+            f"Repo: https://github.com/{plugin['repo']}"
+        )
+    else:
+        return "查无此插件！"
+
+
+def get_group_plugin_list(group_id: str) -> dict:
     plugin_list = _load_plugin_list()
-    message = "插件列表如下："
+    group_plugin_list = {}
     for plugin in plugin_list:
         if group_id in plugin_list[plugin]:
-            message += f'\n[{"o" if plugin_list[plugin][group_id] else "x"}] {plugin}'
+            group_plugin_list[plugin] = plugin_list[plugin][group_id]
         else:
-            message += f'\n[{"o" if plugin_list[plugin]["0"] else "x"}] {plugin}'
-    return message
+            group_plugin_list[plugin] = plugin_list[plugin]["0"]
+    return group_plugin_list
 
 
-def store_pulgin_list(store_plugin_list):
+def get_store_pulgin_list() -> str:
     message = "商店插件列表如下："
-    for plugin in store_plugin_list:
+    for plugin in _get_store_plugin_list():
         if plugin in _load_plugin_list() or plugin == "nonebot_plugin_manager":
             message += f"\n[o] {plugin}"
         else:
@@ -46,8 +63,18 @@ def unblock_plugin(group_id: str, *plugins: str):
     return _update_plugin_list(group_id, False, *plugins)
 
 
+# 获取商店插件列表
+def _get_store_plugin_list() -> dict:
+    store_plugin_list = {}
+    for plugin in httpx.get(
+        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2@master/docs/.vuepress/public/plugins.json"
+    ).json():
+        store_plugin_list.update({plugin["id"]: plugin})
+    return store_plugin_list
+
+
 # 更新插件列表
-def _update_plugin_list(group_id: str, block: bool, *plugins: str):
+def _update_plugin_list(group_id: str, block: bool, *plugins: str) -> str:
     plugin_list = _load_plugin_list()
     message = "结果如下："
     operate = "屏蔽" if block else "启用"

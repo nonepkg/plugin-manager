@@ -78,6 +78,8 @@ export = require("nonebot_plugin_manager")
 # 在指定群聊中启用/禁用插件
 export.block_plugins(group_id, *plugins)
 export.unblock_plugins(group_id, *plugins)
+# 获取指定群插件列表
+export.get_group_plugin_list(group_id)
 ```
 
 ### Q&A

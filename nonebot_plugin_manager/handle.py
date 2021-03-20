@@ -1,7 +1,6 @@
 from argparse import Namespace
 
 from .data import *
-from .plugin import get_plugin_info, get_store_plugin_list
 
 
 def handle_list(
@@ -14,7 +13,7 @@ def handle_list(
 
     if args.store:
         if is_superuser:
-            return store_pulgin_list(get_store_plugin_list())
+            return get_store_pulgin_list()
         else:
             return "获取商店插件列表需要超级用户权限！"
 
@@ -32,7 +31,11 @@ def handle_list(
         else:
             return "获取指定群插件列表需要超级用户权限！"
 
-    message += plugin_list(group_id)
+    message += "插件列表如下：\n"
+    message += "\n".join(
+        f"[{'o' if get_group_plugin_list(group_id)[plugin] else 'x'}] {plugin}"
+        for plugin in get_group_plugin_list(group_id)
+    )
     return message
 
 
@@ -105,7 +108,7 @@ def handle_info(
     if not is_admin and not is_superuser:
         return "管理插件需要超级权限！"
 
-    return get_plugin_info(args.plugin)
+    return get_store_plugin_info(args.plugin)
 
 
 def handle_install(
