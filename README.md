@@ -116,6 +116,8 @@ export.get_group_plugin_list(group_id)
 
 - [ ] 无法停用 Matcher 以外的功能（也就是说无法屏蔽主动发消息的插件，例如 Harukabot ）。
 - [x] 目前任何人都可以屏蔽/启用插件
+- [ ] 不能在其他插件里 import 本插件，否则将导致自锁。  
+解决方法：等 a12
 
 ### Changelog
 
