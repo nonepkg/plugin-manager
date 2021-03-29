@@ -16,7 +16,6 @@ from .parser import npm_parser
 export = export()
 export.block_plugin = block_plugin
 export.unblock_plugin = unblock_plugin
-export.unblock_plugin = unblock_plugin
 export.get_group_plugin_list = get_group_plugin_list
 
 # 注册 shell_like 事件响应器
@@ -27,19 +26,15 @@ plugin_manager = on_shell_command("npm", parser=npm_parser, priority=1)
 async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
     plugin = matcher.module
     group_id = _get_group_id(event)
-    loaded_plugin_list = _get_loaded_plugin_list()
-    plugin_list = auto_update_plugin_list(loaded_plugin_list)
+
+    auto_update_plugin_list(_get_loaded_plugin_list())
 
     # 无视本插件的 Mathcer
     if plugin == "nonebot_plugin_manager":
         return
 
-    if group_id in plugin_list[plugin]:
-        if not plugin_list[plugin][group_id]:
-            raise IgnoredException(f"Nonebot Plugin Manager has blocked {plugin} !")
-    else:
-        if not plugin_list[plugin]["0"]:
-            raise IgnoredException(f"Nonebot Plugin Manager has blocked {plugin} !")
+    if get_group_plugin_list(group_id)[plugin]:
+        raise IgnoredException(f"Nonebot Plugin Manager has blocked {plugin} !")
 
 
 @plugin_manager.handle()

@@ -46,6 +46,8 @@ def handle_block(
     is_superuser: bool,
 ) -> str:
 
+    plugins = args.plugins
+
     if not is_admin and not is_superuser:
         return "管理插件需要群管理员权限！"
 
@@ -65,7 +67,10 @@ def handle_block(
         else:
             return "管理指定群插件需要超级用户权限！"
 
-    message += block_plugin(group_id, *args.plugins)
+    if args.all:
+        plugins = get_group_plugin_list(group_id)
+
+    message += block_plugin(group_id, *plugins)
     return message
 
 
@@ -75,10 +80,13 @@ def handle_unblock(
     is_admin: bool,
     is_superuser: bool,
 ) -> str:
-    message = ""
+
+    plugins = args.plugins
 
     if not is_admin and not is_superuser:
         return "管理插件需要群管理员权限！"
+
+    message = ""
 
     if args.default:
         if is_superuser:
@@ -94,7 +102,10 @@ def handle_unblock(
         else:
             return "管理指定群插件需要超级用户权限！"
 
-    message += unblock_plugin(group_id, *args.plugins)
+    if args.all:
+        plugins = get_group_plugin_list(group_id)
+
+    message += unblock_plugin(group_id, *plugins)
     return message
 
 
