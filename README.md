@@ -124,6 +124,7 @@ export.get_group_plugin_list(group_id)
 
 ### Changelog
 
+- 210330，修复启用/禁用颠倒的 bug。
 - 210329，修复 block/unblock 指令中的 -a 参数无效的 bug，修复文档中导出部分的错误。
 - 210320,新增 `get_group_plugin_list` 的 export 用于获取群插件列表。
 - 210317，调整项目结构，将绝大多数数据处理操作移至 data，handle 只负责调用；修改 export，不再对其他插件暴露底层接口。

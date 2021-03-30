@@ -33,7 +33,7 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
     if plugin == "nonebot_plugin_manager":
         return
 
-    if get_group_plugin_list(group_id)[plugin]:
+    if not get_group_plugin_list(group_id)[plugin]:
         raise IgnoredException(f"Nonebot Plugin Manager has blocked {plugin} !")
 
 
