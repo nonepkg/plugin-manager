@@ -5,3 +5,4 @@ __pycache__
 !README.md
 !LICENSE
 !.gitignore
+!/docs/

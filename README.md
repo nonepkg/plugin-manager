@@ -1,3 +1,6 @@
+<div align="center">
+	<img width="200" src="docs/logo.png" alt="logo"></br>
+
 # Nonebot Plugin Manager
 
 适用于 [nonebot2](https://github.com/nonebot/nonebot2) 的**非侵入式**插件管理器
@@ -6,6 +9,8 @@
 ![Python Version](https://img.shields.io/badge/python-3.7.3+-blue.svg)
 ![NoneBot Version](https://img.shields.io/badge/nonebot-2.0.0a11+-red.svg)
 ![Pypi Version](https://img.shields.io/pypi/v/nonebot-plugin-manager.svg)
+
+</div>
 
 ### 安装
 
@@ -117,14 +122,15 @@ export.get_group_plugin_list(group_id)
 ### Bug
 
 - [ ] 无法停用 Matcher 以外的机器人行为（如 APSchedule ）  
-      **解决方法：**暂无
+      **解决方法：** 暂无
 - [x] 任何人都可以屏蔽/启用插件
 - [ ] 不能在其他插件里 import 本插件，否则将导致自锁。  
-      **解决方法：**等 a12
+      **解决方法：** 等 a12
 
 ### Changelog
 
-- 210330，修复启用/禁用颠倒的 bug。
+- 210331，添加 logo。
+- 210330，修复禁用/启用颠倒的 bug。
 - 210329，修复 block/unblock 指令中的 -a 参数无效的 bug，修复文档中导出部分的错误。
 - 210320,新增 `get_group_plugin_list` 的 export 用于获取群插件列表。
 - 210317，调整项目结构，将绝大多数数据处理操作移至 data，handle 只负责调用；修改 export，不再对其他插件暴露底层接口。
