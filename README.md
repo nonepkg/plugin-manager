@@ -124,8 +124,8 @@ export.get_group_plugin_list(group_id)
 - [ ] 无法停用 Matcher 以外的机器人行为（如 APSchedule ）  
       **解决方法：** 暂无
 - [x] 任何人都可以屏蔽/启用插件
-- [ ] 不能在其他插件里 import 本插件，否则将导致自锁。  
-      **解决方法：** 等 a12
+- [ ] - [ ] 如果加载了内置插件将会导致错误
+      **解决方法：** 问低调佬
 
 ### Changelog
 

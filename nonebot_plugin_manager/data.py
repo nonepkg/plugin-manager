@@ -13,7 +13,7 @@ def get_store_plugin_info(plugin: str) -> str:
             f"ID: {plugin['id']}\n"
             f"Name: {plugin['name']}\n"
             f"Description: {plugin['desc']}\n"
-            f"Version: {httpx.get('https://pypi.org/pypi/'+plugin['link']+'/json').json()['info']['version']}\n"
+            f"Latest Version: {httpx.get('https://pypi.org/pypi/'+plugin['link']+'/json').json()['info']['version']}\n"
             f"Author: {plugin['author']}\n"
             f"Repo: https://github.com/{plugin['repo']}"
         )

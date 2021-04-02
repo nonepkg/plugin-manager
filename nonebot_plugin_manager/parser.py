@@ -2,10 +2,7 @@ from nonebot.rule import ArgumentParser
 
 from .handle import *
 
-npm_parser = ArgumentParser("npm", add_help=False)
-npm_parser.add_argument(
-    "-h", "--help", action="store_true", help="show this help message and exit"
-)
+npm_parser = ArgumentParser("npm")
 
 npm_subparsers = npm_parser.add_subparsers()
 
