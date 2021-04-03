@@ -24,7 +24,7 @@ plugin_manager = on_shell_command("npm", parser=npm_parser, priority=1)
 # 在 Matcher 运行前检测其是否启用
 @run_preprocessor
 async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
-    plugin = matcher.module.split(".")[0]
+    plugin = matcher.module.split(".", maxsplit = 1)[0]
     group_id = _get_group_id(event)
 
     auto_update_plugin_list(_get_loaded_plugin_list())

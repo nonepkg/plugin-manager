@@ -28,7 +28,7 @@ def get_group_plugin_list(group_id: str) -> dict:
         if group_id in plugin_list[plugin]:
             group_plugin_list[plugin] = plugin_list[plugin][group_id]
         else:
-            group_plugin_list[plugin] = plugin_list[plugin]["0"]
+            group_plugin_list[plugin] = plugin_list[plugin]["default"]
     return group_plugin_list
 
 
@@ -45,8 +45,8 @@ def get_store_pulgin_list() -> str:
 def auto_update_plugin_list(loaded_plugin_list: list, keep_history: bool = False):
     plugin_list = _load_plugin_list()
     for plugin in loaded_plugin_list:
-        if plugin not in plugin_list:
-            plugin_list[plugin] = {"0": True}
+        if plugin not in plugin_list or "default" not in plugin_list[plugin]:
+            plugin_list[plugin] = {"default": True}
     if not keep_history:
         plugin_list = {
             key: plugin_list[key] for key in plugin_list if key in loaded_plugin_list

@@ -13,6 +13,7 @@ list_parser.add_argument(
 list_parser.add_argument(
     "-d", "--default", action="store_true", help="show default plugin list"
 )
+list_parser.add_argument("-p", "--private", action="store_true", help="set in private")
 list_parser.add_argument("-g", "--group", action="store", help="show group plugin list")
 list_parser.set_defaults(handle=handle_list)
 
@@ -21,6 +22,7 @@ block_parser.add_argument("plugins", nargs="*", help="plugins you want to block"
 block_parser.add_argument("-d", "--default", action="store_true", help="set default")
 block_parser.add_argument("-a", "--all", action="store_true", help="select all plugin")
 block_parser.add_argument("-g", "--group", action="store", help="set in group")
+block_parser.add_argument("-p", "--private", action="store_true", help="set in private")
 block_parser.set_defaults(handle=handle_block)
 
 unblock_parser = npm_subparsers.add_parser("unblock", help="unblock plugin")
@@ -29,6 +31,7 @@ unblock_parser.add_argument("-d", "--default", action="store_true", help="set de
 unblock_parser.add_argument(
     "-a", "--all", action="store_true", help="select all plugin"
 )
+unblock_parser.add_argument("-p", "--private", action="store_true", help="set in private")
 unblock_parser.add_argument("-g", "--group", action="store", help="set in group")
 unblock_parser.set_defaults(handle=handle_unblock)
 
