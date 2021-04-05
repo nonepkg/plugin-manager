@@ -12,9 +12,9 @@ repository = "https://github.com/Jigsaw111/nonebot_plugin_manager"
 python = "^3.7.3"
 nonebot2 = "^2.0.0-alpha.11"
 nonebot-adapter-cqhttp = "^2.0.0a11.post2"
-# nonebot_plugin_apscheduler = "^0.1.2"
 
 [tool.poetry.dev-dependencies]
+nb-cli = "^0.4.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
