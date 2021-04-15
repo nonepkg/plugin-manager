@@ -24,7 +24,7 @@ plugin_manager = on_shell_command("npm", parser=npm_parser, priority=1)
 # 在 Matcher 运行前检测其是否启用
 @run_preprocessor
 async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
-    plugin = matcher.module.split(".", maxsplit = 1)[0]
+    plugin = matcher.module.split(".", maxsplit=1)[0]
     group_id = _get_group_id(event)
 
     auto_update_plugin_list(_get_loaded_plugin_list())
@@ -51,9 +51,13 @@ async def _(bot: Bot, event: Event, state: T_State):
 # 获取插件列表，并自动排除本插件
 def _get_loaded_plugin_list() -> list:
     return list(
-        filter(
-            lambda plugin: plugin != "nonebot_plugin_manager",
-            map(lambda plugin: plugin.name, get_loaded_plugins()),
+        map(
+            lambda plugin: plugin.name,
+            filter(
+                lambda plugin: plugin.name != "nonebot_plugin_manager"
+                and plugin.matcher != set(),
+                get_loaded_plugins(),
+            ),
         )
     )
 

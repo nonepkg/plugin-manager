@@ -31,7 +31,9 @@ unblock_parser.add_argument("-d", "--default", action="store_true", help="set de
 unblock_parser.add_argument(
     "-a", "--all", action="store_true", help="select all plugin"
 )
-unblock_parser.add_argument("-p", "--private", action="store_true", help="set in private")
+unblock_parser.add_argument(
+    "-p", "--private", action="store_true", help="set in private"
+)
 unblock_parser.add_argument("-g", "--group", action="store", help="set in group")
 unblock_parser.set_defaults(handle=handle_unblock)
 
@@ -43,12 +45,6 @@ install_parser = npm_subparsers.add_parser("install", help="install plugin")
 install_parser.add_argument("plugins", nargs="*", help="plugins you want to install")
 install_parser.add_argument("-i", "--index", action="store", help="point to a mirror")
 install_parser.set_defaults(handle=handle_install)
-
-update_parser = npm_subparsers.add_parser("update", help="update plugin")
-update_parser.add_argument("plugins", nargs="*", help="plugins you want to update")
-update_parser.add_argument("-a", "--all", action="store_true", help="select all plugin")
-update_parser.add_argument("-i", "--index", action="store", help="point to a mirror")
-update_parser.set_defaults(handle=handle_update)
 
 uninstall_parser = npm_subparsers.add_parser("uninstall", help="uninstall plugin")
 uninstall_parser.add_argument(

@@ -3,7 +3,7 @@
 
 # Nonebot Plugin Manager
 
-适用于 [nonebot2](https://github.com/nonebot/nonebot2) 的**非侵入式**插件管理器
+基于 [nonebot2](https://github.com/nonebot/nonebot2) 和 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) 的**非侵入式**插件管理器
 
 [![License](https://img.shields.io/github/license/Jigsaw111/nonebot_plugin_manager)](LICENSE)
 ![Python Version](https://img.shields.io/badge/python-3.7.3+-blue.svg)
@@ -124,11 +124,12 @@ export.get_group_plugin_list(group_id)
 - [ ] 无法停用 Matcher 以外的机器人行为（如 APSchedule ）  
       **解决方法：** 暂无
 - [x] 任何人都可以屏蔽/启用插件
-- [ ] 如果加载了内置插件将会导致错误
+- [ ] 如果加载了内置插件将会导致错误  
       **解决方法：** 问低调佬
 
 ### Changelog
 
+- 210415，不再将没有 Matcher 的插件添加到插件列表。
 - 210403，分离默认设置与私聊设置，默认设置的键值改为 `default`。
 - 210402，修复 nonebot 2.0.0a13 更新导致的 bug。
 - 210331，添加 logo。

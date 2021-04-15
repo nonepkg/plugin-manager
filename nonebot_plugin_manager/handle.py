@@ -66,7 +66,7 @@ def handle_block(
             message += "默认"
         else:
             return "管理默认插件需要超级用户权限！"
-    
+
     if args.private:
         if is_superuser:
             group_id = "0"
@@ -108,7 +108,49 @@ def handle_unblock(
             message += "默认"
         else:
             return "管理默认插件需要超级用户权限！"
-    
+
+    if args.private:
+        if is_superuser:
+            group_id = "0"
+            message += "私聊"
+        else:
+            return "管理私聊插件需要超级用户权限！"
+
+    if args.group:
+        if is_superuser:
+            group_id = args.group
+            message += f"群{args.group}"
+        else:
+            return "管理指定群插件需要超级用户权限！"
+
+    if args.all:
+        plugins = get_group_plugin_list(group_id)
+
+    message += unblock_plugin(group_id, *plugins)
+    return message
+
+
+def handle_pause(
+    args: Namespace,
+    group_id: str,
+    is_admin: bool,
+    is_superuser: bool,
+) -> str:
+
+    plugins = args.plugins
+
+    if not is_admin and not is_superuser:
+        return "管理插件需要群管理员权限！"
+
+    message = ""
+
+    if args.default:
+        if is_superuser:
+            group_id = "default"
+            message += "默认"
+        else:
+            return "管理默认插件需要超级用户权限！"
+
     if args.private:
         if is_superuser:
             group_id = "0"
@@ -144,15 +186,6 @@ def handle_info(
 
 
 def handle_install(
-    args: Namespace,
-    group_id: str,
-    is_admin: bool,
-    is_superuser: bool,
-) -> str:
-    pass
-
-
-def handle_update(
     args: Namespace,
     group_id: str,
     is_admin: bool,
