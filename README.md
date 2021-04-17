@@ -80,11 +80,26 @@ from nonebot import require
 
 export = require("nonebot_plugin_manager")
 
-# 在指定群聊中启用/禁用插件
-export.block_plugin(group_id, *plugins)
-export.unblock_plugin(group_id, *plugins)
-# 获取指定群插件列表
-export.get_group_plugin_list(group_id)
+# 启用/禁用插件
+export.block_plugin(
+    plugins: Iterable[str],
+    type: Optional[str] = None,
+    user_id: Optional[int] = None,
+    group_id: Optional[int] = None,
+) -> Dict[str, Optional[bool]]:
+export.unblock_plugin(
+    plugins: Iterable[str],
+    type: Optional[str] = None,
+    user_id: Optional[int] = None,
+    group_id: Optional[int] = None,
+) -> Dict[str, Optional[bool]]:
+
+# 获取指定会话插件列表
+export.get_plugin_list(
+    type: Optional[str] = None,
+    user_id: Optional[int] = None,
+    group_id: Optional[int] = None,
+) -> Dict[str, bool]:
 ```
 
 ### Q&A
@@ -100,7 +115,6 @@ export.get_group_plugin_list(group_id)
 
 [nonebot/nb-cli](https://github.com/nonebot/nb-cli)
 
-
 <details>
 <summary>展开更多</summary>
 
@@ -114,7 +128,7 @@ export.get_group_plugin_list(group_id)
 
 当然，你也可以使用 `npm uninstall` 命令来真正卸载插件，但我不建议你这样做，因为该命令将会重启 Nonebot 。
 
-### TO DO
+### To Do
 
 - [x] 分群插件管理
 - [ ] 安装卸载插件
@@ -129,19 +143,43 @@ export.get_group_plugin_list(group_id)
 
 ### Changelog
 
-- 210415，不再将没有 Matcher 的插件添加到插件列表。
-- 210403，分离默认设置与私聊设置，默认设置的键值改为 `default`。
-- 210402，修复 nonebot 2.0.0a13 更新导致的 bug。
-- 210331，添加 logo。
-- 210330，修复禁用/启用颠倒的 bug。
-- 210329，修复 block/unblock 指令中的 -a 参数无效的 bug，修复文档中导出部分的错误。
-- 210320，新增 `get_group_plugin_list` 的 export 用于获取群插件列表。
-- 210317，调整项目结构，将绝大多数数据处理操作移至 data，handle 只负责调用；修改 export，不再对其他插件暴露底层接口。
-- 210314，修复 `npm list`  的 --group 参数不起作用的 bug，实现查询插件信息。
-- 210313，实现爬取插件商店列表，实现 -h 参数，新增 export 导出给其他插件。
-- 210312，重构 0.3.0，`setting.json` 重命名为 `plugin_list.json`，结构改为 `plugin:{group_id:true,group_id:false}`。
-- 210310，0.3.0 完工，将__init__.py分离成 setting,command,nb 三个文件。
-- 210310，0.2.0 完工，命令格式改为 shelllike，使用 `setting.json` 作为配置文件，基本结构为 `group_id:{plugin:true,plugin:false}` 。
-- 210307，0.1.0 完工，上架插件商店。确定了通过 `run_preprocessor` 屏蔽 Matcher 的基本原理，使用 `block_list` 作为全局设置（即只屏蔽 block_list 中的插件）
+- 210417 0.4.0-alpha.1
+- - 配置文件格式更换为 `.yml` 
+- - list/block/unblock 新增 `globally` 选项，优先级为 global > user/group > default
+- - 重构代码，分离 handle 与 data
+- - block/unblock 新增 `--reverse` 选项，可反选插件
+- 210415
+- - 不再将没有 Matcher 的插件添加到插件列表。
+- 210403
+- - 分离默认设置与私聊设置，默认设置的键值改为 `default`
+- 210402
+- - 修复 nonebot 2.0.0a13 更新导致的 bug。
+- 210331
+- - 添加 logo。
+- 210330
+- - 修复禁用/启用颠倒的 bug。
+- 210329
+- - 修复 block/unblock 指令中的 -a 参数无效的 bug，修复文档中导出部分的错误。
+- 210320
+- - 新增 `get_group_plugin_list` 的 export 用于获取群插件列表。
+- 210317
+- - 调整项目结构，将绝大多数数据处理操作移至 data，handle 只负责调用；修改 export，不再对其他插件暴露底层接口。
+- 210314
+- - 修复 `npm list`  的 --group 参数不起作用的 bug
+- - 新增 `info` 子命令，用于查询插件信息
+- 210313
+- - 实现爬取插件商店列表
+- - 新增 export 导出给其他插件
+- 210312
+- - `setting.json` 重命名为 `plugin_list.json`，结构改为 `plugin:{group_id:true,group_id:false}`
+- 210310 0.3.0
+- - 将__init__.py分离成 setting, command, nb 三个文件
+- 210310 0.2.0
+-  - Matcher 类型更改为 shell_command
+-  - 使用 `setting.json` 作为配置文件，基本结构为 `group_id:{plugin:true,plugin:false}` 
+- 210307 0.1.0
+- - 上架插件商店
+- - 确定了通过 `run_preprocessor` 屏蔽 Matcher 的基本原理
+- - 使用 `block_list` 作为全局设置（即只屏蔽 block_list 中的插件）
 
 </details>

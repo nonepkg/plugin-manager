@@ -3,201 +3,178 @@ from argparse import Namespace
 from .data import *
 
 
-def handle_list(
-    args: Namespace,
-    group_id: str,
-    is_admin: bool,
-    is_superuser: bool,
-) -> str:
-    message = ""
+def handle_list(args: Namespace) -> Namespace:
 
     if args.store:
-        if is_superuser:
-            return get_store_pulgin_list()
+        if args.is_superuser:
+            args.message = get_store_pulgin_list()
         else:
-            return "获取商店插件列表需要超级用户权限！"
-
-    if args.default:
-        if is_superuser:
-            group_id = "default"
-            message += "默认"
+            args.message = "获取商店插件列表需要超级用户权限！"
+    elif args.globally:
+        if args.is_superuser:
+            args.type = "global"
+            args.message += "全局"
         else:
-            return "获取默认插件列表需要超级用户权限！"
-
-    if args.private:
-        if is_superuser:
-            group_id = "0"
-            message += "私聊"
+            args.message = "获取全局插件列表需要超级用户权限！"
+    elif args.user:
+        if args.is_superuser:
+            args.user_id = args.user
+            args.message += f"用户{args.user}"
         else:
-            return "获取私聊插件列表需要超级用户权限！"
-
-    if args.group:
-        if is_superuser:
-            group_id = args.group
-            message += f"群{args.group}"
+            args.message = "获取指定用户插件列表需要超级用户权限！"
+    elif args.group:
+        if args.is_superuser:
+            args.group_id = args.group
+            args.message += f"群{args.group}"
         else:
-            return "获取指定群插件列表需要超级用户权限！"
+            args.message = "获取指定群插件列表需要超级用户权限！"
+    elif args.default:
+        if args.is_superuser:
+            args.type = "default"
+            args.message += "默认"
+        else:
+            args.message = "获取指定群插件列表需要超级用户权限！"
 
-    message += "插件列表如下：\n"
-    message += "\n".join(
-        f"[{'o' if get_group_plugin_list(group_id)[plugin] else 'x'}] {plugin}"
-        for plugin in get_group_plugin_list(group_id)
+    args.message += "插件列表如下：\n"
+    plugin_list = get_plugin_list(args.type, args.user_id, args.group_id)
+    args.message += "\n".join(
+        f"[{'o' if plugin_list[plugin] else 'x'}] {plugin}" for plugin in plugin_list
     )
-    return message
+
+    return args
 
 
-def handle_block(
-    args: Namespace,
-    group_id: str,
-    is_admin: bool,
-    is_superuser: bool,
-) -> str:
+def handle_block(args: Namespace) -> Namespace:
 
-    plugins = args.plugins
+    if args.group and not args.is_admin and not args.is_superuser:
+        args.message = "管理群插件需要群管理员权限！"
 
-    if not is_admin and not is_superuser:
-        return "管理插件需要群管理员权限！"
-
-    message = ""
-
-    if args.default:
-        if is_superuser:
-            group_id = "default"
-            message += "默认"
+    if args.globally:
+        if args.is_superuser:
+            args.type = "global"
+            args.message += "全局"
         else:
-            return "管理默认插件需要超级用户权限！"
-
-    if args.private:
-        if is_superuser:
-            group_id = "0"
-            message += "私聊"
+            args.message = "管理全局插件需要超级用户权限！"
+    elif args.user:
+        if args.is_superuser:
+            args.user_id = args.user
+            args.message += f"用户{args.user}"
         else:
-            return "管理私聊插件需要超级用户权限！"
-
-    if args.group:
-        if is_superuser:
-            group_id = args.group
-            message += f"群{args.group}"
+            args.message = "管理指定用户插件需要超级用户权限！"
+    elif args.group:
+        if args.is_superuser:
+            args.group_id = args.group
+            args.message += f"群{args.group}"
         else:
-            return "管理指定群插件需要超级用户权限！"
+            args.message = "管理指定群插件需要超级用户权限！"
+    elif args.default:
+        if args.is_superuser:
+            args.type = "default"
+            args.message += "默认"
+        else:
+            args.message = "管理默认插件需要超级用户权限！"
 
     if args.all:
-        plugins = get_group_plugin_list(group_id)
+        args.plugins = [
+            plugin for plugin in get_plugin_list(args.type, args.user_id, args.group_id)
+        ]
 
-    message += block_plugin(group_id, *plugins)
-    return message
+    if args.reverse:
+        args.plugins = list(
+            filter(
+                lambda plugin: plugin not in args.plugins,
+                get_plugin_list(args.type, args.user_id, args.group_id),
+            )
+        )
+
+    args.message += "结果如下："
+    result = block_plugin(args.plugins, args.type, args.user_id, args.group_id)
+    if result:
+        for plugin in result:
+            args.message += "\n"
+            if result[plugin] is None:
+                args.message += f"插件 {plugin} 不存在！"
+            elif result[plugin]:
+                args.message += f"插件 {plugin} 禁用成功！"
+            else:
+                args.message += f"插件 {plugin} 已全局启用，请联系超级用户！"
+    else:
+        args.message = ""
+
+    return args
 
 
-def handle_unblock(
-    args: Namespace,
-    group_id: str,
-    is_admin: bool,
-    is_superuser: bool,
-) -> str:
+def handle_unblock(args: Namespace) -> Namespace:
 
-    plugins = args.plugins
+    if args.group and not args.is_admin and not args.is_superuser:
+        args.message = "管理群插件需要群管理员权限！"
 
-    if not is_admin and not is_superuser:
-        return "管理插件需要群管理员权限！"
-
-    message = ""
-
-    if args.default:
-        if is_superuser:
-            group_id = "default"
-            message += "默认"
+    if args.globally:
+        if args.is_superuser:
+            args.type = "global"
+            args.message += "全局"
         else:
-            return "管理默认插件需要超级用户权限！"
-
-    if args.private:
-        if is_superuser:
-            group_id = "0"
-            message += "私聊"
+            args.message = "管理全局插件需要超级用户权限！"
+    elif args.user:
+        if args.is_superuser:
+            args.user_id = args.user
+            args.message += f"用户{args.user}"
         else:
-            return "管理私聊插件需要超级用户权限！"
-
-    if args.group:
-        if is_superuser:
-            group_id = args.group
-            message += f"群{args.group}"
+            args.message = "管理指定用户插件需要超级用户权限！"
+    elif args.group:
+        if args.is_superuser:
+            args.group_id = args.group
+            args.message += f"群{args.group}"
         else:
-            return "管理指定群插件需要超级用户权限！"
+            args.message = "管理指定群插件需要超级用户权限！"
+    elif args.default:
+        if args.is_superuser:
+            args.type = "default"
+            args.message += "默认"
+        else:
+            args.message = "管理默认插件需要超级用户权限！"
 
     if args.all:
-        plugins = get_group_plugin_list(group_id)
+        args.plugins = [
+            plugin for plugin in get_plugin_list(args.type, args.user_id, args.group_id)
+        ]
 
-    message += unblock_plugin(group_id, *plugins)
-    return message
+    if args.reverse:
+        args.plugins = list(
+            filter(
+                lambda plugin: plugin not in args.plugins,
+                get_plugin_list(args.type, args.user_id, args.group_id),
+            )
+        )
 
+    args.message += "结果如下："
+    result = unblock_plugin(args.plugins, args.type, args.user_id, args.group_id)
+    if result:
+        for plugin in result:
+            args.message += "\n"
+            if result[plugin] is None:
+                args.message += f"插件 {plugin} 不存在！"
+            elif result[plugin]:
+                args.message += f"插件 {plugin} 启用成功！"
+            else:
+                args.message += f"插件 {plugin} 已全局禁用，请联系超级用户！"
+    else:
+        args.message = ""
 
-def handle_pause(
-    args: Namespace,
-    group_id: str,
-    is_admin: bool,
-    is_superuser: bool,
-) -> str:
-
-    plugins = args.plugins
-
-    if not is_admin and not is_superuser:
-        return "管理插件需要群管理员权限！"
-
-    message = ""
-
-    if args.default:
-        if is_superuser:
-            group_id = "default"
-            message += "默认"
-        else:
-            return "管理默认插件需要超级用户权限！"
-
-    if args.private:
-        if is_superuser:
-            group_id = "0"
-            message += "私聊"
-        else:
-            return "管理私聊插件需要超级用户权限！"
-
-    if args.group:
-        if is_superuser:
-            group_id = args.group
-            message += f"群{args.group}"
-        else:
-            return "管理指定群插件需要超级用户权限！"
-
-    if args.all:
-        plugins = get_group_plugin_list(group_id)
-
-    message += unblock_plugin(group_id, *plugins)
-    return message
+    return args
 
 
-def handle_info(
-    args: Namespace,
-    group_id: str,
-    is_admin: bool,
-    is_superuser: bool,
-) -> str:
+def handle_info(args: Namespace) -> Namespace:
 
-    if not is_admin and not is_superuser:
-        return "管理插件需要超级权限！"
+    if not args.is_admin and not args.is_superuser:
+        args.message = "获取插件信息需要超级用户权限！"
 
-    return get_store_plugin_info(args.plugin)
+    args.message = get_plugin_info(args.plugin)
 
 
-def handle_install(
-    args: Namespace,
-    group_id: str,
-    is_admin: bool,
-    is_superuser: bool,
-) -> str:
+def handle_install(args: Namespace) -> Namespace:
     pass
 
 
-def handle_uninstall(
-    args: Namespace,
-    group_id: str,
-    is_admin: bool,
-    is_superuser: bool,
-) -> str:
+def handle_uninstall(args: Namespace) -> Namespace:
     pass

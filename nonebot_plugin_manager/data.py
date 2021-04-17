@@ -1,12 +1,13 @@
-import json
+import yaml
 import httpx
 from pathlib import Path
+from typing import Any, Iterable, Optional, Dict, List
 
-_DATA_PATH = Path() / "data" / "manager" / "plugin_list.json"
+__DATA_PATH = Path() / "data" / "manager" / "plugin_list.yml"
 
 
-def get_store_plugin_info(plugin: str) -> str:
-    store_plugin_list = _get_store_plugin_list()
+def get_plugin_info(plugin: str) -> str:
+    store_plugin_list = __get_store_plugin_list()
     if plugin in store_plugin_list:
         plugin = store_plugin_list[plugin]
         return (
@@ -21,50 +22,71 @@ def get_store_plugin_info(plugin: str) -> str:
         return "查无此插件！"
 
 
-def get_group_plugin_list(group_id: str) -> dict:
-    plugin_list = _load_plugin_list()
-    group_plugin_list = {}
+def get_plugin_list(
+    type: Optional[str] = None,
+    user_id: Optional[int] = None,
+    group_id: Optional[int] = None,
+) -> Dict[str, bool]:
+
+    plugin_list = __load_plugin_list()
+    tmp_plugin_list = {}
+
     for plugin in plugin_list:
-        if group_id in plugin_list[plugin]:
-            group_plugin_list[plugin] = plugin_list[plugin][group_id]
-        else:
-            group_plugin_list[plugin] = plugin_list[plugin]["default"]
-    return group_plugin_list
+
+        if "global" in plugin_list[plugin]:
+            tmp_plugin_list[plugin] = plugin_list[plugin]["global"]
+
+        if type == "user" or user_id in plugin_list[plugin]["user"]:
+            tmp_plugin_list[plugin] = plugin_list[plugin]["user"][user_id]
+
+        if type == "group" or group_id in plugin_list[plugin]["group"]:
+            tmp_plugin_list[plugin] = plugin_list[plugin]["group"][group_id]
+
+        if type == "default" or plugin not in tmp_plugin_list:
+            tmp_plugin_list[plugin] = plugin_list[plugin]["default"]
+
+    return tmp_plugin_list
 
 
 def get_store_pulgin_list() -> str:
     message = "商店插件列表如下："
-    for plugin in _get_store_plugin_list():
-        if plugin in _load_plugin_list() or plugin == "nonebot_plugin_manager":
+    for plugin in __get_store_plugin_list():
+        if plugin in __load_plugin_list() or plugin == "nonebot_plugin_manager":
             message += f"\n[o] {plugin}"
         else:
             message += f"\n[x] {plugin}"
     return message
 
 
-def auto_update_plugin_list(loaded_plugin_list: list, keep_history: bool = False):
-    plugin_list = _load_plugin_list()
+def auto_update_plugin_list(loaded_plugin_list: List[str]) -> Dict[str, Any]:
+    plugin_list = __load_plugin_list()
     for plugin in loaded_plugin_list:
-        if plugin not in plugin_list or "default" not in plugin_list[plugin]:
-            plugin_list[plugin] = {"default": True}
-    if not keep_history:
-        plugin_list = {
-            key: plugin_list[key] for key in plugin_list if key in loaded_plugin_list
-        }
-    _dump_plugin_list(plugin_list)
+        if plugin not in plugin_list:
+            plugin_list[plugin] = {"default": True, "user": {}, "group": {}}
+    __dump_plugin_list(plugin_list)
     return plugin_list
 
 
-def block_plugin(group_id: str, *plugins: str):
-    return _update_plugin_list(group_id, True, *plugins)
+def block_plugin(
+    plugins: Iterable[str],
+    type: Optional[str] = None,
+    user_id: Optional[int] = None,
+    group_id: Optional[int] = None,
+) -> Dict[str, Optional[bool]]:
+    return __update_plugin_list(plugins, True, type, user_id, group_id)
 
 
-def unblock_plugin(group_id: str, *plugins: str):
-    return _update_plugin_list(group_id, False, *plugins)
+def unblock_plugin(
+    plugins: Iterable[str],
+    type: Optional[str] = None,
+    user_id: Optional[int] = None,
+    group_id: Optional[int] = None,
+) -> Dict[str, Optional[bool]]:
+    return __update_plugin_list(plugins, False, type, user_id, group_id)
 
 
 # 获取商店插件列表
-def _get_store_plugin_list() -> dict:
+def __get_store_plugin_list() -> dict:
     store_plugin_list = {}
     for plugin in httpx.get(
         "https://cdn.jsdelivr.net/gh/nonebot/nonebot2@master/docs/.vuepress/public/plugins.json"
@@ -74,41 +96,71 @@ def _get_store_plugin_list() -> dict:
 
 
 # 更新插件列表
-def _update_plugin_list(group_id: str, block: bool, *plugins: str) -> str:
-    plugin_list = _load_plugin_list()
-    message = "结果如下："
-    operate = "屏蔽" if block else "启用"
+def __update_plugin_list(
+    plugins: Iterable[str],
+    block: bool,
+    type: Optional[str] = None,
+    user_id: Optional[int] = None,
+    group_id: Optional[int] = None,
+) -> Dict[str, Optional[bool]]:
+
+    plugin_list = __load_plugin_list()
+
+    result = {}
+
     for plugin in plugins:
-        message += "\n"
         if plugin in plugin_list:
+
             if (
-                not group_id in plugin_list[plugin]
-                or plugin_list[plugin][group_id] == block
+                type == "global"
+                and "global" in plugin_list[plugin]
+                or type == "default"
             ):
-                plugin_list[plugin][group_id] = not block
-                message += f"插件{plugin}{operate}成功！"
+                status = plugin_list[plugin][type]
+            elif type == "user" or user_id in plugin_list[plugin]["user"]:
+                status = plugin_list[plugin]["user"][user_id]
+            elif type == "group" or group_id in plugin_list[plugin]["group"]:
+                status = plugin_list[plugin]["group"][group_id]
             else:
-                message += f"插件{plugin}已经{operate}！"
+                status = None
+
+            if (
+                "global" not in plugin_list[plugin]
+                or plugin_list[plugin]["global"] == block
+            ) and (status is None or status == block):
+                status = not block
+                result[plugin] = True
+            else:
+                result[plugin] = False
+
+            if status is not None:
+                if type == "global" or type == "default":
+                    plugin_list[plugin][type] = status
+                elif type == "user" or user_id:
+                    plugin_list[plugin]["user"][user_id] = status
+                elif type == "group" or group_id:
+                    plugin_list[plugin]["group"][group_id] = status
         else:
-            message += f"插件{plugin}不存在！"
-    _dump_plugin_list(plugin_list)
-    return message
+            result[plugin] = None
+
+    __dump_plugin_list(plugin_list)
+
+    return result
 
 
 # 加载插件列表
-def _load_plugin_list() -> dict:
+def __load_plugin_list() -> Dict[str, Any]:
     try:
-        return json.load(_DATA_PATH.open("r", encoding="utf-8"))
+        return yaml.safe_load(__DATA_PATH.open("r", encoding="utf-8"))
     except FileNotFoundError:
         return {}
 
 
 # 保存插件列表
-def _dump_plugin_list(plugin_list: dict):
-    _DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
-    json.dump(
+def __dump_plugin_list(plugin_list: Dict[str, Any]):
+    __DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+    yaml.dump(
         plugin_list,
-        _DATA_PATH.open("w", encoding="utf-8"),
-        indent=4,
-        separators=(",", ": "),
+        __DATA_PATH.open("w", encoding="utf-8"),
+        allow_unicode=True,
     )
