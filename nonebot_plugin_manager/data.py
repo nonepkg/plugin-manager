@@ -98,7 +98,7 @@ def __update_plugin_list(
             if (
                 type == "global"
                 or "global" not in plugin_list[plugin]
-                or plugin_list[plugin]["global"] != block
+                or plugin_list[plugin]["global"]
             ):
                 status = not block
                 result[plugin] = True
