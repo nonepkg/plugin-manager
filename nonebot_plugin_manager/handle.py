@@ -171,6 +171,8 @@ def handle_info(args: Namespace) -> Namespace:
 
     args.message = get_plugin_info(args.plugin)
 
+    return args
+
 
 def handle_install(args: Namespace) -> Namespace:
     pass

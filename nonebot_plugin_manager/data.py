@@ -35,14 +35,11 @@ def get_plugin_list(
 
         if "global" in plugin_list[plugin]:
             tmp_plugin_list[plugin] = plugin_list[plugin]["global"]
-
-        if type == "user" or user_id in plugin_list[plugin]["user"]:
+        elif type == "user" or user_id in plugin_list[plugin]["user"]:
             tmp_plugin_list[plugin] = plugin_list[plugin]["user"][user_id]
-
-        if type == "group" or group_id in plugin_list[plugin]["group"]:
+        elif type == "group" or group_id in plugin_list[plugin]["group"]:
             tmp_plugin_list[plugin] = plugin_list[plugin]["group"][group_id]
-
-        if type == "default" or plugin not in tmp_plugin_list:
+        elif type == "default" or plugin not in tmp_plugin_list:
             tmp_plugin_list[plugin] = plugin_list[plugin]["default"]
 
     return tmp_plugin_list
@@ -124,9 +121,10 @@ def __update_plugin_list(
                 status = None
 
             if (
-                "global" not in plugin_list[plugin]
-                or plugin_list[plugin]["global"] == block
-            ) and (status is None or status == block):
+                type == "global"
+                or "global" not in plugin_list[plugin]
+                or plugin_list[plugin]["global"] != block
+            ):
                 status = not block
                 result[plugin] = True
             else:
