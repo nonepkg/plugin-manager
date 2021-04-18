@@ -16,7 +16,7 @@ from .parser import (
 export = export()
 export.block_plugin = block_plugin
 export.unblock_plugin = unblock_plugin
-export.get_group_plugin_list = get_plugin_list
+export.get_plugin_list = get_plugin_list
 
 # 注册 shell_like 事件响应器
 plugin_manager = on_shell_command("npm", parser=npm_parser, priority=1)
