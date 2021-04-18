@@ -30,21 +30,15 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
     group_id = event.group_id if isinstance(event, GroupMessageEvent) else None
 
     auto_update_plugin_list(
-        [
-            str(plugin.name)
-            for plugin in filter(
-                lambda plugin: plugin.name != "nonebot_plugin_manager"
-                and plugin.matcher,
-                get_loaded_plugins(),
-            )
-        ]
+        {
+            str(plugin.name): plugin.name != "nonebot_plugin_manager" and plugin.matcher
+            for plugin in get_loaded_plugins()
+        }
     )
 
-    # 无视本插件的 Mathcer
-    if plugin == "nonebot_plugin_manager":
-        return
+    plugin_list = get_plugin_list(user_id=user_id, group_id=group_id)
 
-    if not get_plugin_list(user_id=user_id, group_id=group_id)[plugin]:
+    if plugin in plugin_list and not plugin_list[plugin]:
         raise IgnoredException(f"Nonebot Plugin Manager has blocked {plugin} !")
 
 

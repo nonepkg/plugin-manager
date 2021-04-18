@@ -7,6 +7,7 @@ npm_parser = ArgumentParser("npm")
 npm_subparsers = npm_parser.add_subparsers()
 
 list_parser = npm_subparsers.add_parser("list", help="show plugin list")
+list_parser.add_argument("-i", "--ignore", action="store_true")
 list_group = list_parser.add_mutually_exclusive_group()
 list_group.add_argument("-s", "--store", action="store_true")
 list_group.add_argument("-gl", "--globally", action="store_true")

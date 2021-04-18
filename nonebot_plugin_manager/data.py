@@ -1,65 +1,50 @@
 import yaml
-import httpx
 from pathlib import Path
-from typing import Any, Iterable, Optional, Dict, List
+from typing import Any, Dict, Iterable, Optional
 
 __DATA_PATH = Path() / "data" / "manager" / "plugin_list.yml"
-
-
-def get_plugin_info(plugin: str) -> str:
-    store_plugin_list = __get_store_plugin_list()
-    if plugin in store_plugin_list:
-        plugin = store_plugin_list[plugin]
-        return (
-            f"ID: {plugin['id']}\n"
-            f"Name: {plugin['name']}\n"
-            f"Description: {plugin['desc']}\n"
-            f"Latest Version: {httpx.get('https://pypi.org/pypi/'+plugin['link']+'/json').json()['info']['version']}\n"
-            f"Author: {plugin['author']}\n"
-            f"Repo: https://github.com/{plugin['repo']}"
-        )
-    else:
-        return "查无此插件！"
 
 
 def get_plugin_list(
     type: Optional[str] = None,
     user_id: Optional[int] = None,
     group_id: Optional[int] = None,
+    show_ignore: bool = False,
 ) -> Dict[str, bool]:
 
     plugin_list = __load_plugin_list()
     tmp_plugin_list = {}
 
     for plugin in plugin_list:
-
-        if "global" in plugin_list[plugin]:
-            tmp_plugin_list[plugin] = plugin_list[plugin]["global"]
-        elif type == "user" or user_id in plugin_list[plugin]["user"]:
-            tmp_plugin_list[plugin] = plugin_list[plugin]["user"][user_id]
-        elif type == "group" or group_id in plugin_list[plugin]["group"]:
-            tmp_plugin_list[plugin] = plugin_list[plugin]["group"][group_id]
-        elif type == "default" or plugin not in tmp_plugin_list:
-            tmp_plugin_list[plugin] = plugin_list[plugin]["default"]
+        if (
+            show_ignore
+            and plugin_list[plugin]["ignore"] is not None
+            or plugin_list[plugin]["ignore"] == False
+        ):
+            if "global" in plugin_list[plugin]:
+                tmp_plugin_list[plugin] = plugin_list[plugin]["global"]
+            elif type == "user" or user_id in plugin_list[plugin]["user"]:
+                tmp_plugin_list[plugin] = plugin_list[plugin]["user"][user_id]
+            elif type == "group" or group_id in plugin_list[plugin]["group"]:
+                tmp_plugin_list[plugin] = plugin_list[plugin]["group"][group_id]
+            elif type == "default" or plugin not in tmp_plugin_list:
+                tmp_plugin_list[plugin] = plugin_list[plugin]["default"]
 
     return tmp_plugin_list
 
 
-def get_store_pulgin_list() -> str:
-    message = "商店插件列表如下："
-    for plugin in __get_store_plugin_list():
-        if plugin in __load_plugin_list() or plugin == "nonebot_plugin_manager":
-            message += f"\n[o] {plugin}"
-        else:
-            message += f"\n[x] {plugin}"
-    return message
-
-
-def auto_update_plugin_list(loaded_plugin_list: List[str]):
+def auto_update_plugin_list(loaded_plugin_list: Dict[str, bool]):
     plugin_list = __load_plugin_list()
+
     for plugin in loaded_plugin_list:
         if plugin not in plugin_list:
             plugin_list[plugin] = {"default": True, "user": {}, "group": {}}
+        plugin_list[plugin]["ignore"] = not loaded_plugin_list[plugin]
+
+    for plugin in plugin_list:
+        if plugin not in loaded_plugin_list:
+            plugin_list[plugin]["ignore"] = None
+
     __dump_plugin_list(plugin_list)
 
 
@@ -81,16 +66,6 @@ def unblock_plugin(
     return __update_plugin_list(plugins, False, type, user_id, group_id)
 
 
-# 获取商店插件列表
-def __get_store_plugin_list() -> dict:
-    store_plugin_list = {}
-    for plugin in httpx.get(
-        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2@master/docs/.vuepress/public/plugins.json"
-    ).json():
-        store_plugin_list.update({plugin["id"]: plugin})
-    return store_plugin_list
-
-
 # 更新插件列表
 def __update_plugin_list(
     plugins: Iterable[str],
@@ -105,7 +80,7 @@ def __update_plugin_list(
     result = {}
 
     for plugin in plugins:
-        if plugin in plugin_list:
+        if plugin in plugin_list and plugin_list[plugin]["ignore"] == False:
 
             if (
                 type == "global"
