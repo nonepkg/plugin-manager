@@ -44,20 +44,29 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 
 **使用前请先确保命令前缀为空，否则请在以下命令前加上命令前缀 (默认为 `/` )。**
 
-- `npm list` 查看当前群插件列表
-- - `-s, --store` 可选参数，查看 Nonebot 插件商店（仅超级用户可用）
+- `npm list` 查看当前会话插件列表
+- - `-i, --ignore` 可选参数，显示已忽略的插件
+- - `-s, --store` 可选参数，查看插件商店列表（仅超级用户可用）
+- - `-gl, --global` 可选参数，管理全局设置（仅超级用户可用）
+- - `-g group_id, --group group_id` 可选参数，管理指定群设置（仅超级用户可用）
+- - `-u user_id, --user user_id` 可选参数，管理指定用户设置（仅超级用户可用）
 - - `-d, --default` 可选参数，管理默认设置（仅超级用户可用）
-- - `-g group_id, --group group_id` 可选参数，管理指定群设置（仅超级用户可用）
 
-- `npm block 插件名...` 屏蔽当前群插件 （仅群管及超级用户可用）
+- `npm block 插件名...` 屏蔽当前会话插件 （仅群管及超级用户可用）
 - - `-a, --all` 可选参数，全选插件
-- - `-d, --default` 可选参数，管理默认设置 （仅超级用户可用）
+- - `-r, --reverse` 可选参数，反选插件
+- - `-gl, --global` 可选参数，管理全局设置（仅超级用户可用）
 - - `-g group_id, --group group_id` 可选参数，管理指定群设置（仅超级用户可用）
+- - `-u user_id, --user user_id` 可选参数，管理指定用户设置（仅超级用户可用）
+- - `-d, --default` 可选参数，管理默认设置（仅超级用户可用）
 
-- `npm unblock 插件名...` 启用当前群插件 （仅群管及超级用户可用）
+- `npm unblock 插件名...` 启用当前会话插件 （仅群管及超级用户可用）
 - - `-a, --all` 可选参数，全选插件
-- - `-d, --default` 可选参数，管理默认设置 （仅超级用户可用）
+- - `-r, --reverse` 可选参数，反选插件
+- - `-gl, --global` 可选参数，管理全局设置（仅超级用户可用）
 - - `-g group_id, --group group_id` 可选参数，管理指定群设置（仅超级用户可用）
+- - `-u user_id, --user user_id` 可选参数，管理指定用户设置（仅超级用户可用）
+- - `-d, --default` 可选参数，管理默认设置（仅超级用户可用）
 
 - `npm info 插件名` 查询插件信息 （仅超级用户可用）
 
@@ -65,10 +74,6 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 
 - `npm install 插件名...` 安装插件 （仅超级用户可用）
 - - `-i index, --index index` 指定 PyPI 源
-
-- `npm update 插件名...` 更新插件 （仅超级用户可用）
-- - `-i index, --index index` 指定 PyPI 源
-- - `-a, --all` 可选参数，全选插件
 
 - `npm uninstall 插件名...` 卸载插件 （仅超级用户可用）
 - - `-a, --all` 可选参数，全选插件
@@ -86,20 +91,21 @@ export.block_plugin(
     type: Optional[str] = None,
     user_id: Optional[int] = None,
     group_id: Optional[int] = None,
-) -> Dict[str, Optional[bool]]:
+    show_ignore: bool = False,
+) -> Dict[str, Optional[bool]]
 export.unblock_plugin(
     plugins: Iterable[str],
     type: Optional[str] = None,
     user_id: Optional[int] = None,
     group_id: Optional[int] = None,
-) -> Dict[str, Optional[bool]]:
+) -> Dict[str, Optional[bool]]
 
 # 获取指定会话插件列表
 export.get_plugin_list(
     type: Optional[str] = None,
     user_id: Optional[int] = None,
     group_id: Optional[int] = None,
-) -> Dict[str, bool]:
+) -> Dict[str, bool]
 ```
 
 ### Q&A
@@ -143,6 +149,13 @@ export.get_plugin_list(
 
 ### Changelog
 
+- 210418 0.4.0-alpha.4
+- - 新增 `--ignore` 用于显示已忽略的插件（即没有 Matcher 的插件和 npm 本身）
+- - 修复判断表达式错误导致的插件列表为空
+- - 修复使用 load_from_toml 加载插件时产生的错误
+- - 修复 export 的函数名称错误
+- - 修复 npm info 指令不响应的错误
+- - 修复 global 设置无效的错误
 - 210417 0.4.0-alpha.1
 - - 配置文件格式更换为 `.yml` 
 - - list/block/unblock 新增 `globally` 选项，优先级为 global > user/group > default
