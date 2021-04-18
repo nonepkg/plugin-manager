@@ -21,7 +21,7 @@ def get_plugin_list(
             and plugin_list[plugin]["ignore"] is not None
             or plugin_list[plugin]["ignore"] == False
         ):
-            if "global" in plugin_list[plugin]:
+            if plugin_list[plugin]["global"] is not None:
                 tmp_plugin_list[plugin] = plugin_list[plugin]["global"]
             elif type == "user" or user_id in plugin_list[plugin]["user"]:
                 tmp_plugin_list[plugin] = plugin_list[plugin]["user"][user_id]
@@ -38,7 +38,12 @@ def auto_update_plugin_list(loaded_plugin_list: Dict[str, bool]):
 
     for plugin in loaded_plugin_list:
         if plugin not in plugin_list:
-            plugin_list[plugin] = {"default": True, "user": {}, "group": {}}
+            plugin_list[plugin] = {
+                "global": None,
+                "user": {},
+                "group": {},
+                "default": True,
+            }
         plugin_list[plugin]["ignore"] = not loaded_plugin_list[plugin]
 
     for plugin in plugin_list:
@@ -81,12 +86,7 @@ def __update_plugin_list(
 
     for plugin in plugins:
         if plugin in plugin_list and plugin_list[plugin]["ignore"] == False:
-
-            if (
-                type == "global"
-                and "global" in plugin_list[plugin]
-                or type == "default"
-            ):
+            if type == "global" or type == "default":
                 status = plugin_list[plugin][type]
             elif type == "user" or user_id in plugin_list[plugin]["user"]:
                 status = plugin_list[plugin]["user"][user_id]
@@ -95,11 +95,7 @@ def __update_plugin_list(
             else:
                 status = None
 
-            if (
-                type == "global"
-                or "global" not in plugin_list[plugin]
-                or plugin_list[plugin]["global"]
-            ):
+            if type == "global" or not plugin_list[plugin]["global"] == False:
                 status = not block
                 result[plugin] = True
             else:
