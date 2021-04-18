@@ -31,7 +31,7 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
 
     auto_update_plugin_list(
         [
-            plugin.name
+            str(plugin.name)
             for plugin in filter(
                 lambda plugin: plugin.name != "nonebot_plugin_manager"
                 and plugin.matcher,
