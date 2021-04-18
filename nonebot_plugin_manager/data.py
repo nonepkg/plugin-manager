@@ -58,13 +58,12 @@ def get_store_pulgin_list() -> str:
     return message
 
 
-def auto_update_plugin_list(loaded_plugin_list: List[str]) -> Dict[str, Any]:
+def auto_update_plugin_list(loaded_plugin_list: List[str]):
     plugin_list = __load_plugin_list()
     for plugin in loaded_plugin_list:
         if plugin not in plugin_list:
             plugin_list[plugin] = {"default": True, "user": {}, "group": {}}
     __dump_plugin_list(plugin_list)
-    return plugin_list
 
 
 def block_plugin(

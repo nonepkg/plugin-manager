@@ -29,7 +29,16 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
     user_id = event.user_id if isinstance(event, PrivateMessageEvent) else None
     group_id = event.group_id if isinstance(event, GroupMessageEvent) else None
 
-    auto_update_plugin_list(__get_loaded_plugin_list())
+    auto_update_plugin_list(
+        [
+            plugin.name
+            for plugin in filter(
+                lambda plugin: plugin.name != "nonebot_plugin_manager"
+                and plugin.matcher,
+                get_loaded_plugins(),
+            )
+        ]
+    )
 
     # 无视本插件的 Mathcer
     if plugin == "nonebot_plugin_manager":
@@ -57,15 +66,3 @@ async def _(bot: Bot, event: Event, state: T_State):
         args = args.handle(args)
         if args.message:
             await bot.send(event, args.message)
-
-
-# 获取插件列表，并自动排除本插件
-def __get_loaded_plugin_list() -> list:
-    return [
-        plugin.name
-        for plugin in filter(
-            lambda plugin: plugin.name != "nonebot_plugin_manager"
-            and not plugin.matcher,
-            get_loaded_plugins(),
-        )
-    ]
