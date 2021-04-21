@@ -13,29 +13,32 @@ list_group.add_argument("-s", "--store", action="store_true")
 list_group.add_argument("-gl", "--globally", action="store_true")
 list_group.add_argument("-u", "--user", action="store", type=int)
 list_group.add_argument("-g", "--group", action="store", type=int)
-list_group.add_argument("-d", "--default", action="store_true")
 list_parser.set_defaults(handle=handle_list)
 
 block_parser = npm_subparsers.add_parser("block", help="block plugin")
 block_parser.add_argument("plugins", nargs="*", help="plugins you want to block")
 block_parser.add_argument("-a", "--all", action="store_true")
 block_parser.add_argument("-r", "--reverse", action="store_true")
-block_group = block_parser.add_mutually_exclusive_group()
-block_group.add_argument("-gl", "--globally", action="store_true")
-block_group.add_argument("-u", "--user", action="store", type=int)
-block_group.add_argument("-g", "--group", action="store", type=int)
-block_group.add_argument("-d", "--default", action="store_true")
+block_parser.add_argument("-gl", "--globally", action="store_true")
+block_parser.add_argument(
+    "-u", "--user", action="store", nargs="+", default=[], type=int
+)
+block_parser.add_argument(
+    "-g", "--group", action="store", nargs="+", default=[], type=int
+)
 block_parser.set_defaults(handle=handle_block)
 
 unblock_parser = npm_subparsers.add_parser("unblock", help="unblock plugin")
 unblock_parser.add_argument("plugins", nargs="*", help="plugins you want to unblock")
 unblock_parser.add_argument("-a", "--all", action="store_true")
 unblock_parser.add_argument("-r", "--reverse", action="store_true")
-unblock_group = unblock_parser.add_mutually_exclusive_group()
-unblock_group.add_argument("-gl", "--globally", action="store_true")
-unblock_group.add_argument("-u", "--user", action="store", type=int)
-unblock_group.add_argument("-g", "--group", action="store", type=int)
-unblock_group.add_argument("-d", "--default", action="store_true")
+unblock_parser.add_argument("-gl", "--globally", action="store_true")
+unblock_parser.add_argument(
+    "-u", "--user", action="store", nargs="+", default=[], type=int
+)
+unblock_parser.add_argument(
+    "-g", "--group", action="store", nargs="+", default=[], type=int
+)
 unblock_parser.set_defaults(handle=handle_unblock)
 
 info_parser = npm_subparsers.add_parser("info", help="show plugin info")
