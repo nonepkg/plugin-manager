@@ -91,7 +91,6 @@ export.block_plugin(
     type: Optional[str] = None,
     user_id: Optional[int] = None,
     group_id: Optional[int] = None,
-    show_ignore: bool = False,
 ) -> Dict[str, Optional[bool]]
 export.unblock_plugin(
     plugins: Iterable[str],
@@ -105,6 +104,7 @@ export.get_plugin_list(
     type: Optional[str] = None,
     user_id: Optional[int] = None,
     group_id: Optional[int] = None,
+    show_ignore: bool = False,
 ) -> Dict[str, bool]
 ```
 
@@ -137,6 +137,11 @@ export.get_plugin_list(
 ### To Do
 
 - [x] 分群插件管理
+- [ ] 调整优先级为 global > user > group > default
+- [ ] 可同时管理多个 群/用户 的插件列表
+
+*咕咕咕*
+
 - [ ] 安装卸载插件
 
 ### Bug
