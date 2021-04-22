@@ -29,20 +29,17 @@ async def _(matcher: Matcher, bot: Bot, event: MessageEvent, state: T_State):
 
     plugin_list.update_plugin(
         {
-            str(plugin.name): plugin.name == "nonebot_plugin_manager"
-            or not plugin.matcher
+            str(plugin.name): plugin.name != "nonebot_plugin_manager" and plugin.matcher
             for plugin in get_loaded_plugins()
         }
     )
-    plugins = plugin_list.get_plugin(user_id=user_id, group_id=group_id)
-    if plugin in plugins and plugins[plugin]:
+    if not plugin_list.get_plugins("+", user_id, group_id)[plugin]:
         raise IgnoredException(f"Nonebot Plugin Manager has blocked {plugin} !")
 
 
 @plugin_manager.handle()
 async def _(bot: Bot, event: MessageEvent, state: T_State):
     args = state["args"]
-    args.type = None
     args.user_id = event.user_id if isinstance(event, PrivateMessageEvent) else None
     args.group_id = event.group_id if isinstance(event, GroupMessageEvent) else None
     args.is_admin = (

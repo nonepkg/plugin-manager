@@ -7,188 +7,157 @@ def handle_list(args: Namespace) -> str:
 
     message = ""
 
-    if args.globally:
+    if args.user:
         if args.is_superuser:
-            args.type = "global"
-            message = "全局"
-        else:
-            return "获取全局插件列表需要超级用户权限！"
-    elif args.user:
-        if args.is_superuser:
-            args.type = "user"
+            args.mode = "user"
             args.user_id = args.user
             message = f"用户 {args.user}"
         else:
             return "获取指定用户插件列表需要超级用户权限！"
     elif args.group:
         if args.is_superuser:
-            args.type = "group"
+            args.mode = "group"
             args.group_id = args.group
             message = f"群 {args.group}"
         else:
             return "获取指定群插件列表需要超级用户权限！"
+    else:
+        args.mode = ""
 
     if args.ignore:
-        if args.is_superuser:
-            args.type = "ignore"
-        else:
-            return "查看已忽略插件需要超级用户权限！"
+        args.mode += "+"
 
     if args.store:
         if args.is_superuser:
-            message = "默认"
+            message = "商店"
             plugin_list = get_store_pulgin_list()
         else:
             return "获取商店插件列表需要超级用户权限！"
     else:
         message += "插件列表如下：\n"
-        plugin_list = PluginList().get_plugin(args.type, args.user_id, args.group_id)
+        plugin_list = PluginList().get_plugins(args.mode, args.user_id, args.group_id)
+        message += "\n".join(
+            f"[{'o' if plugin_list[plugin] else 'x'}] {plugin}"
+            for plugin in plugin_list
+        )
+        return message
 
-    message += "\n".join(
-        f"[{'o' if plugin_list[plugin] else 'x'}] {plugin}" for plugin in plugin_list
+
+def handle_set(args: Namespace) -> str:
+    message = ""
+    plugin_list = PluginList()
+    args.user_id = [args.user_id] if args.user_id else []
+    args.group_id = [args.group_id] if args.group_id else []
+    if not args.is_superuser:
+        return "设置插件模式需要超级用户权限！"
+
+    plugins = plugin_list.get_plugins()
+
+    if args.all:
+        args.plugins = list(filter(lambda plugin: plugins[plugin], plugins))
+    if args.reverse:
+        args.plugins = list(filter(lambda plugin: plugin not in args.plugins, plugins))
+
+    result = plugin_list.set_plugin(args.plugins, args.mode)
+    message += (
+        "用户: " if args.user_id else "" + ",".join([str(id) for id in args.user_id])
     )
-
+    message += (
+        "群: " if args.group_id else "" + ",".join([str(id) for id in args.group_id])
+    )
+    message += "的插件列表操作结果如下："
+    for plugin in result:
+        message += "\n"
+        if result[plugin]:
+            message += f"插件 {plugin} 的模式成功设置为 {args.mod}！"
+        else:
+            message += f"插件 {plugin} 不存在或已关闭编辑权限！"
     return message
 
 
 def handle_block(args: Namespace) -> str:
 
     message = ""
-    conv = {}
-
     plugin_list = PluginList()
-
-    if args.is_admin and not args.is_superuser:
-        if args.group_id:
+    args.user_id = [args.user_id] if args.user_id else []
+    args.group_id = [args.group_id] if args.group_id else []
+    if args.group_id:
+        if not args.is_admin:
             return "管理群插件需要群管理员权限！"
-        else:
+    else:
+        if not args.is_superuser:
             return "管理用户插件需要超级用户权限！"
 
-    if args.globally:
-        if args.is_superuser:
-            conv["global"] = []
-        else:
-            return "管理全局插件需要超级用户权限！"
-    elif args.user:
-        if args.is_superuser:
-            conv["user"] = args.user
-        else:
-            return "管理指定用户插件需要超级用户权限！"
-    elif args.group:
-        if args.is_superuser:
-            conv["group"] = args.group
-        else:
-            return "管理指定群插件需要超级用户权限！"
-    else:
-        conv = {
-            "user"
-            if args.user_id
-            else "group": [args.user_id if args.user_id else args.group_id]
-        }
+    if args.user or args.group:
+        args.user_id = args.user
+        args.group_id = args.group
+
+    plugins = plugin_list.get_plugins()
 
     if args.all:
-        args.plugins = [
-            plugin
-            for plugin in plugin_list.get_plugin(args.type, args.user_id, args.group_id)
-        ]
-
+        args.plugins = list(filter(lambda plugin: plugins[plugin], plugins))
     if args.reverse:
-        args.plugins = list(
-            filter(
-                lambda plugin: plugin not in args.plugins,
-                plugin_list.get_plugin(args.type, args.user_id, args.group_id),
-            )
-        )
-    result = {}
-    for type in conv:
-        message += "全局," if type == "group" else "用户 " if type == "user" else "群 "
-        for id in conv[type]:
-            message += f"{str(id)},"
-            result = plugin_list.block_plugin(
-                args.plugins,
-                type,
-                id if type == "user" else None,
-                id if type == "group" else None,
-            )
-    if result:
-        message += "中操作结果如下："
-        for plugin in result:
-            message += "\n"
-            if result[plugin]:
-                message += f"插件 {plugin} 禁用成功！"
-            else:
-                message += f"插件 {plugin} 不存在或处于白名单模式！"
+        args.plugins = list(filter(lambda plugin: plugin not in args.plugins, plugins))
 
+    result = plugin_list.block_plugin(
+        args.plugins, args.user_id, args.group_id, args.is_superuser
+    )
+    message += (
+        "用户: " if args.user_id else "" + ",".join([str(id) for id in args.user_id])
+    )
+    message += (
+        "群: " if args.group_id else "" + ",".join([str(id) for id in args.group_id])
+    )
+    message += "的插件列表操作结果如下："
+    for plugin in result:
+        message += "\n"
+        if result[plugin]:
+            message += f"插件 {plugin} 禁用成功！"
+        else:
+            message += f"插件 {plugin} 不存在或已关闭编辑权限！"
     return message
 
 
 def handle_unblock(args: Namespace) -> str:
 
     message = ""
-    conv = {}
     plugin_list = PluginList()
-
-    if args.is_admin and not args.is_superuser:
-        if args.group_id:
+    args.user_id = [args.user_id] if args.user_id else []
+    args.group_id = [args.group_id] if args.group_id else []
+    if args.group_id:
+        if not args.is_admin:
             return "管理群插件需要群管理员权限！"
-        else:
+    else:
+        if not args.is_superuser:
             return "管理用户插件需要超级用户权限！"
 
-    if args.globally:
-        if args.is_superuser:
-            conv["global"] = []
-        else:
-            return "管理全局插件需要超级用户权限！"
-    elif args.user:
-        if args.is_superuser:
-            conv["user"] = args.user
-        else:
-            return "管理指定用户插件需要超级用户权限！"
-    elif args.group:
-        if args.is_superuser:
-            conv["group"] = args.group
-        else:
-            return "管理指定群插件需要超级用户权限！"
-    else:
-        conv = {
-            "user"
-            if args.user_id
-            else "group": [args.user_id if args.user_id else args.group_id]
-        }
+    if args.user or args.group:
+        args.user_id = args.user
+        args.group_id = args.group
+
+    plugins = plugin_list.get_plugins()
 
     if args.all:
-        args.plugins = [
-            plugin
-            for plugin in plugin_list.get_plugin(args.type, args.user_id, args.group_id)
-        ]
-
+        args.plugins = list(filter(lambda plugin: plugins[plugin], plugins))
     if args.reverse:
-        args.plugins = list(
-            filter(
-                lambda plugin: plugin not in args.plugins,
-                plugin_list.get_plugin(args.type, args.user_id, args.group_id),
-            )
-        )
-    result = {}
-    for type in conv:
-        message += "全局," if type == "group" else "用户 " if type == "user" else "群 "
-        for id in conv[type]:
-            message += str(id)
-            result = plugin_list.unblock_plugin(
-                args.plugins,
-                type,
-                id if type == "user" else None,
-                id if type == "group" else None,
-            )
-    if result:
-        message += "中操作结果如下："
-        for plugin in result:
-            message += "\n"
-            if result[plugin]:
-                message += f"插件 {plugin} 解禁成功！"
-            else:
-                message += f"插件 {plugin} 不存在或处于白名单模式！"
+        args.plugins = list(filter(lambda plugin: plugin not in args.plugins, plugins))
 
+    result = plugin_list.unblock_plugin(
+        args.plugins, args.user_id, args.group_id, args.is_superuser
+    )
+    message += (
+        "用户: " if args.user_id else "" + ",".join([str(id) for id in args.user_id])
+    )
+    message += (
+        "群: " if args.group_id else "" + ",".join([str(id) for id in args.group_id])
+    )
+    message += "的插件列表操作结果如下："
+    for plugin in result:
+        message += "\n"
+        if result[plugin]:
+            message += f"插件 {plugin} 启用成功！"
+        else:
+            message += f"插件 {plugin} 不存在或已关闭编辑权限！"
     return message
 
 

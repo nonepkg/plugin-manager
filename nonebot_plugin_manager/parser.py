@@ -10,16 +10,25 @@ list_parser = npm_subparsers.add_parser("list", help="show plugin list")
 list_parser.add_argument("-i", "--ignore", action="store_true")
 list_group = list_parser.add_mutually_exclusive_group()
 list_group.add_argument("-s", "--store", action="store_true")
-list_group.add_argument("-gl", "--globally", action="store_true")
 list_group.add_argument("-u", "--user", action="store", type=int)
 list_group.add_argument("-g", "--group", action="store", type=int)
 list_parser.set_defaults(handle=handle_list)
+
+set_parser = npm_subparsers.add_parser("set", help="set plugin mode")
+set_parser.add_argument("plugins", nargs="*", help="plugins you want to set")
+set_parser.add_argument(
+    "mode",
+    choices=["black", "black+", "white", "white+"],
+    help="plugins you want to set",
+)
+set_parser.add_argument("-a", "--all", action="store_true")
+set_parser.add_argument("-r", "--reverse", action="store_true")
+set_parser.set_defaults(handle=handle_set)
 
 block_parser = npm_subparsers.add_parser("block", help="block plugin")
 block_parser.add_argument("plugins", nargs="*", help="plugins you want to block")
 block_parser.add_argument("-a", "--all", action="store_true")
 block_parser.add_argument("-r", "--reverse", action="store_true")
-block_parser.add_argument("-gl", "--globally", action="store_true")
 block_parser.add_argument(
     "-u", "--user", action="store", nargs="+", default=[], type=int
 )
@@ -32,7 +41,6 @@ unblock_parser = npm_subparsers.add_parser("unblock", help="unblock plugin")
 unblock_parser.add_argument("plugins", nargs="*", help="plugins you want to unblock")
 unblock_parser.add_argument("-a", "--all", action="store_true")
 unblock_parser.add_argument("-r", "--reverse", action="store_true")
-unblock_parser.add_argument("-gl", "--globally", action="store_true")
 unblock_parser.add_argument(
     "-u", "--user", action="store", nargs="+", default=[], type=int
 )
