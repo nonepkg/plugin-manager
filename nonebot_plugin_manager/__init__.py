@@ -1,47 +1,48 @@
-from nonebot.plugin import Matcher, on_shell_command, get_loaded_plugins, export
+from nonebot.plugin import Matcher, on_shell_command, get_loaded_plugins
 from nonebot.typing import T_State
 from nonebot.exception import IgnoredException
 from nonebot.message import run_preprocessor
 from nonebot.adapters.cqhttp import (
-    MessageEvent,
     Bot,
+    MessageEvent,
     PrivateMessageEvent,
     GroupMessageEvent,
 )
 
-from .parser import npm_parser, PluginList
+from .parser import npm_parser, PluginManager
 
-# 导出给其他插件使用
-export = export()
-export.plugin_list = PluginList()
-
-# 注册 shell_like 事件响应器
-plugin_manager = on_shell_command("npm", parser=npm_parser, priority=1)
+npm = on_shell_command("npm", parser=npm_parser, priority=1)
 
 # 在 Matcher 运行前检测其是否启用
 @run_preprocessor
 async def _(matcher: Matcher, bot: Bot, event: MessageEvent, state: T_State):
 
+    plugin_manager = PluginManager()
     plugin = matcher.module.split(".", maxsplit=1)[0]
-    plugin_list = PluginList()
-    user_id = event.user_id
-    group_id = event.group_id if isinstance(event, GroupMessageEvent) else None
 
-    plugin_list.update_plugin(
+    conv = {
+        "user": [event.user_id],
+        "group": [event.group_id] if isinstance(event, GroupMessageEvent) else [],
+    }
+
+    plugin_manager.update_plugin(
         {
-            str(plugin.name): plugin.name != "nonebot_plugin_manager" and plugin.matcher
-            for plugin in get_loaded_plugins()
+            str(p.name): p.name != "nonebot_plugin_manager" and p.matcher
+            for p in get_loaded_plugins()
         }
     )
-    if not plugin_list.get_plugins("+", user_id, group_id)[plugin]:
+
+    if not plugin_manager.get_plugin(conv=conv, perm=1)[plugin]:
         raise IgnoredException(f"Nonebot Plugin Manager has blocked {plugin} !")
 
 
-@plugin_manager.handle()
+@npm.handle()
 async def _(bot: Bot, event: MessageEvent, state: T_State):
     args = state["args"]
-    args.user_id = event.user_id if isinstance(event, PrivateMessageEvent) else None
-    args.group_id = event.group_id if isinstance(event, GroupMessageEvent) else None
+    args.conv = {
+        "user": [event.user_id] if isinstance(event, PrivateMessageEvent) else [],
+        "group": [event.group_id] if isinstance(event, GroupMessageEvent) else [],
+    }
     args.is_admin = (
         event.sender.role in ["admin", "owner"]
         if isinstance(event, GroupMessageEvent)

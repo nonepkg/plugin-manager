@@ -1,7 +1,7 @@
 import httpx
 from typing import Dict
 
-from .data import PluginList
+from .manager import PluginManager
 
 
 # 获取商店插件列表
@@ -15,7 +15,7 @@ def __get_store_plugin_list() -> dict:
 
 
 def get_store_pulgin_list() -> Dict[str, bool]:
-    plugin_list = PluginList().get_plugin("ignore")
+    plugin_list = PluginManager().get_plugin()
     result = {}
     for plugin in __get_store_plugin_list():
         if plugin in plugin_list:
