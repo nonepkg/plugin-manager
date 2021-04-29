@@ -14,9 +14,7 @@
 
 ### 安装
 
-*由于 0.5 以及之前的版本无法很好地兼容今后的更新计划，已经将其从主分支分离且不再增加新的功能（但我仍会尝试改进代码直到正式发版 0.5.0，并同步主分支上 bug 的修复）。*
-
-**如果你只想要一个较为稳定的版本，那么 0.4.0 或 0.3.13 将是更好的选择。**
+**插件仍在快速开发中，如果你只想要一个较为稳定的版本，那么 0.3.13 或许是更好的选择。**
 
 #### 从 PyPI 安装（推荐）
 
@@ -46,64 +44,65 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 
 ### 使用
 
-#### 模式
+#### 权限
 
-每个插件单独提供黑白名单模式和群管编辑权限开关，一共四种模式。
+权限与 linux 的权限类似，分为三种用户：超级用户、用户、群。
 
-`black` `white` 为最基本的黑/白名单模式，用户优先级始终大于群优先级，当用户优先级未设置时则采用群优先级。
+每种用户包含读、写、执行 3 个权限，分别对应数字 4、2、1，将 3 个权限对应的数字累加，最终得到的值即可作为每种用户所具有的权限。
 
-`black+` `white+` 增加了群管编辑权限，使群管可以管理本群的插件（目前仍有部分 bug）。
+包含 Matcher 的插件默认权限为 `755`，不含 Matcher 的插件默认权限为 `311`。
 
-`black-` `white-` 为隐藏的模式，无法通过命令设置，如果插件为此模式则表示其未加载或不含 Matcher。
+> 例：`npm chmod nonebot_plugin_nodice 757` 命令可将 nonebot_plugin_nodice 的权限设置为 `757`
+> 即超级用户可写可读可执行，用户可读可执行，群可写可读可执行。
+
+只有超级用户可以修改插件的权限，可以使用绝对模式（八进制数字模式）~~，符号模式~~指定文件的权限。
 
 #### 命令
 
 **使用前请先确保命令前缀为空，否则请在以下命令前加上命令前缀 (默认为 `/` )。**
 
-- `npm list` 查看当前会话插件列表
-- - `-i, --ignore` 可选参数，显示已忽略的插件（仅超级用户可用）
+- `npm ls` 查看当前会话插件列表
 - - `-s, --store` 互斥参数，查看插件商店列表（仅超级用户可用）
-- - `-u user_id ..., --user user_id ...` 互斥参数，查看指定用户插件列表（仅超级用户可用）
-- - `-g group_id ..., --group group_id ...` 互斥参数，查看指定群插件列表（仅超级用户可用）
-
-- `npm set plugins mod` 设置插件模式（仅超级用户可用）
-- - `plugins` 必选参数，需要设置的插件名
-- - `mod` 必选参数，需要设置的模式，可设置为 `black` `black+` `white` `white+` 四种
-- - `-a, --all` 可选参数，全选插件
-- - `-r, --reverse` 可选参数，反选插件
-
-- `npm block plugins...` 禁用当前会话插件（仅超级用户或 "+" 模式下群管可用）
--  - `plugins` 必选参数，需要禁用的插件名
-- - `-a, --all` 可选参数，全选插件
-- - `-r, --reverse` 可选参数，反选插件
-- - `-u user_id ..., --user user_id ...` 可选参数，管理指定用户设置（仅超级用户可用）
-- - `-g group_id ..., --group group_id ...` 可选参数，管理指定群设置（仅超级用户可用）
-
-- `npm unblock plugins...` 启用当前会话插件（仅超级用户或 "+" 模式下群管可用）
--  - `plugins` 必选参数，需要禁用的插件名
-- - `-a, --all` 可选参数，全选插件
-- - `-r, --reverse` 可选参数，反选插件
-- - `-u user_id ..., --user user_id ...` 可选参数，管理指定用户设置（仅超级用户可用）
-- - `-g group_id ..., --group group_id ...` 可选参数，管理指定群设置（仅超级用户可用）
+- - `-u user_id, --user user_id` 互斥参数，查看指定用户插件列表（仅超级用户可用）
+- - `-g group_id, --group group_id` 互斥参数，查看指定群插件列表（仅超级用户可用）
+- - `-a, --all` 可选参数，查看所有插件（包括不含 Matcher 的插件）
 
 - `npm info 插件名` 查询插件信息 （仅超级用户可用）
 
+- `npm chmod plugin... mode` 设置插件权限（仅超级用户可用）
+- - `plugin...` 必选参数，需要设置的插件名
+- - `mode` 必选参数，需要设置的权限，参考上文
+- - `-a, --all` 可选参数，全选插件
+- - `-r, --reverse` 可选参数，反选插件
+
+- `npm block plugin...` 禁用当前会话插件（需要权限）
+- - `plugin...` 必选参数，需要禁用的插件名
+- - `-a, --all` 可选参数，全选插件
+- - `-r, --reverse` 可选参数，反选插件
+- - `-u user_id ..., --user user_id ...` 可选参数，管理指定用户设置（仅超级用户可用）
+- - `-g group_id ..., --group group_id ...` 可选参数，管理指定群设置（仅超级用户可用）
+
+- `npm unblock plugin...` 启用当前会话插件（需要权限）
+- - `plugin...` 必选参数，需要禁用的插件名
+- - `-a, --all` 可选参数，全选插件
+- - `-r, --reverse` 可选参数，反选插件
+- - `-u user_id ..., --user user_id ...` 可选参数，管理指定用户设置（仅超级用户可用）
+- - `-g group_id ..., --group group_id ...` 可选参数，管理指定群设置（仅超级用户可用）
+
 *以下功能尚未实现*
 
-- `npm install 插件名...` 安装插件 （仅超级用户可用）
+- `npm install 插件名...` 安装插件（仅超级用户可用）
 - - `-i index, --index index` 指定 PyPI 源
 
-- `npm uninstall 插件名...` 卸载插件 （仅超级用户可用）
+- `npm uninstall 插件名...` 卸载插件（仅超级用户可用）
 - - `-a, --all` 可选参数，全选插件
 
-### 导出
+#### 导入
+
+`PluginManager` 是封装好的插件管理器类，导入后可以直接使用。
 
 ```python
-from nonebot import require
-
-export = require("nonebot_plugin_manager")
-
-plugin_list = export.plugin_list
+from nonebot_plugin_manager import PluginManager
 ```
 
 ### Q&A
@@ -135,6 +134,7 @@ plugin_list = export.plugin_list
 ### To Do
 
 - [x] 分群插件管理
+- [ ] 完善权限系统
 - [ ] 设置插件别名
 
 *咕咕咕*
@@ -143,16 +143,19 @@ plugin_list = export.plugin_list
 
 ### Bug
 
-- [ ] 无法停用 Matcher 以外的机器人行为（如 APSchedule ）  
-      **解决方法：** 暂无
+- [ ] 无法停用 Matcher 以外的机器人行为（如 APScheduler ）  
+  **解决方法：** 暂无
 - [x] 任何人都可以屏蔽/启用插件
 - [ ] 如果加载了内置插件将会导致错误  
-      **解决方法：** 问低调佬
+  **解决方法：** 问低调佬
 
 ### Changelog
 
+- 210428 0.5.0-alpha.3
+- - 不再保留插件历史记录
+- - 新增类 UNIX 权限系统
+- - 命令 `list` 改为 `ls`
 - 210423 0.5.0-alpha.2
-- - 从主分支分离,不再增加新的功能
 - - 将 ignore, global 等配置整合成 mode
 - - 新增 `npm set` 命令切换黑/白名单模式
 - 210421 0.5.0-alpha.1
