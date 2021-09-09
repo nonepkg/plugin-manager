@@ -18,7 +18,7 @@ npm = on_shell_command("npm", parser=npm_parser, priority=1)
 async def _(matcher: Matcher, bot: Bot, event: MessageEvent, state: T_State):
 
     plugin_manager = PluginManager()
-    plugin = matcher.module.split(".", maxsplit=1)[0]
+    plugin = matcher.plugin_name
 
     conv = {
         "user": [event.user_id],
