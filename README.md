@@ -89,13 +89,15 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 - - `-u user_id ..., --user user_id ...` 可选参数，管理指定用户设置（仅超级用户可用）
 - - `-g group_id ..., --group group_id ...` 可选参数，管理指定群设置（仅超级用户可用）
 
-*以下功能尚未实现*
+<!-- TODO
 
 - `npm install 插件名...` 安装插件（仅超级用户可用）
 - - `-i index, --index index` 指定 PyPI 源
 
 - `npm uninstall 插件名...` 卸载插件（仅超级用户可用）
 - - `-a, --all` 可选参数，全选插件
+
+-->
 
 #### 导入
 
@@ -114,10 +116,6 @@ from nonebot_plugin_manager import PluginManager
 - **自造 Rule 不是更好？**  
   Rule 当然更好且更有效率，但是 Rule 是一种**侵入式**的插件管理方式，需要用户自行修改其他插件，这对于管理从 pypi 安装的插件来说相对复杂。而使用本插件，你不需要修改其他插件的任何内容，更符合插件之间**松耦合**的设计原则。
 
-### Thanks
-
-[nonebot/nb-cli](https://github.com/nonebot/nb-cli)
-
 <details>
 <summary>展开更多</summary>
 
@@ -127,9 +125,11 @@ from nonebot_plugin_manager import PluginManager
 
 事实上 Nonebot 还是加载了插件，所以只能算是**屏蔽**而非**卸载**。
 
-*以下功能尚未实现*
+<!-- TODO
 
 当然，你也可以使用 `npm uninstall` 命令来真正卸载插件，但我不建议你这样做，因为该命令将会重启 Nonebot 。
+
+-->
 
 ### To Do
 
@@ -146,11 +146,12 @@ from nonebot_plugin_manager import PluginManager
 - [ ] 无法停用 Matcher 以外的机器人行为（如 APScheduler ）  
   **解决方法：** 暂无
 - [x] 任何人都可以屏蔽/启用插件
-- [ ] 如果加载了内置插件将会导致错误  
-  **解决方法：** 问低调佬
+- [x] 如果加载了内置插件将会导致错误  
 
 ### Changelog
 
+- 210909 0.5.0
+- - 适配 nonebot2-2.0.0a15
 - 210428 0.5.0-alpha.3
 - - 不再保留插件历史记录
 - - 新增类 UNIX 权限系统
@@ -199,7 +200,7 @@ from nonebot_plugin_manager import PluginManager
 - 210312
 - - `setting.json` 重命名为 `plugin_list.json`，结构改为 `plugin:{group_id:true,group_id:false}`
 - 210310 0.3.0
-- - 将__init__.py分离成 setting, command, nb 三个文件
+- - 将__init__.py 分离成 setting, command, nb 三个文件
 - 210310 0.2.0
 -  - Matcher 类型更改为 shell_command
 -  - 使用 `setting.json` 作为配置文件，基本结构为 `group_id:{plugin:true,plugin:false}` 
