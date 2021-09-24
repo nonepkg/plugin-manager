@@ -1,9 +1,11 @@
-from nonebot.plugin import Matcher, on_shell_command, get_loaded_plugins
 from nonebot.typing import T_State
-from nonebot.exception import IgnoredException
+from nonebot.matcher import Matcher
 from nonebot.message import run_preprocessor
+from nonebot.exception import IgnoredException
+from nonebot.plugin import on_shell_command, get_loaded_plugins
 from nonebot.adapters.cqhttp import (
     Bot,
+    Event,
     MessageEvent,
     PrivateMessageEvent,
     GroupMessageEvent,
@@ -15,14 +17,14 @@ npm = on_shell_command("npm", parser=npm_parser, priority=1)
 
 # 在 Matcher 运行前检测其是否启用
 @run_preprocessor
-async def _(matcher: Matcher, bot: Bot, event: MessageEvent, state: T_State):
+async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
 
     plugin_manager = PluginManager()
     plugin = matcher.plugin_name
 
     conv = {
-        "user": [event.user_id],
-        "group": [event.group_id] if isinstance(event, GroupMessageEvent) else [],
+        "user": [event.user_id] if hasattr(event, "user_id") else [],
+        "group": [event.group_id] if hasattr(event, "group_id") else [],
     }
 
     plugin_manager.update_plugin(
