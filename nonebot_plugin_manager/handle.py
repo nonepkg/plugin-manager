@@ -90,7 +90,7 @@ def handle_block(args: Namespace) -> str:
     result = {}
     for p in plugin:
         if p in args.plugin and not plugin[p]:
-            args.plugin.pop(p)
+            args.plugin.remove(p)
             result[p] = False
 
     if args.user or args.group:
@@ -139,7 +139,7 @@ def handle_unblock(args: Namespace) -> str:
     result = {}
     for p in plugin:
         if p in args.plugin and not plugin[p]:
-            args.plugin.pop(p)
+            args.plugin.remove(p)
             result[p] = False
 
     if args.user or args.group:
