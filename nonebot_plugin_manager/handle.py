@@ -78,7 +78,7 @@ def handle_block(args: Namespace) -> str:
         plugin = plugin_manager.get_plugin(conv=args.conv, perm=6)
 
     if args.conv["group"]:
-        if not args.is_admin:
+        if not args.is_admin and not args.is_superuser:
             return "管理群插件需要群管理员权限！"
         args.conv["user"] = []
 
@@ -127,7 +127,7 @@ def handle_unblock(args: Namespace) -> str:
         plugin = plugin_manager.get_plugin(conv=args.conv, perm=6)
 
     if args.conv["group"]:
-        if not args.is_admin:
+        if not args.is_admin and not args.is_superuser:
             return "管理群插件需要群管理员权限！"
         args.conv["user"] = []
 
