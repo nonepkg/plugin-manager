@@ -68,11 +68,14 @@ class PluginManager:
                 result[p] = True
                 for t in conv:
                     for i in conv[t]:
-                        self.__plugin_list[p][t][i] = (
-                            self.__plugin_list[p][t][i] & 6
-                            if i in self.__plugin_list[p][t]
-                            else 4
-                        )
+                        if i in self.__plugin_list[p][t]:
+                            mode = self.__plugin_list[p][t][i]
+                        else:
+                            mode = int(
+                                self.__plugin_list[p]["mode"][1 if t == "user" else 2]
+                            )
+                        self.__plugin_list[p][t][i] = mode & 6
+
         self.__dump()
         return result
 
@@ -89,11 +92,13 @@ class PluginManager:
                 result[p] = True
                 for t in conv:
                     for i in conv[t]:
-                        self.__plugin_list[p][t][i] = (
-                            self.__plugin_list[p][t][i] | 1
-                            if i in self.__plugin_list[p][t]
-                            else 5
-                        )
+                        if i in self.__plugin_list[p][t]:
+                            mode = self.__plugin_list[p][t][i]
+                        else:
+                            mode = int(
+                                self.__plugin_list[p]["mode"][1 if t == "user" else 2]
+                            )
+                        self.__plugin_list[p][t][i] = mode | 1
         self.__dump()
         return result
 
