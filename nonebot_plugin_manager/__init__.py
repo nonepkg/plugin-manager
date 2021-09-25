@@ -28,7 +28,8 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
     }
 
     if (
-        isinstance(event, PrivateMessageEvent)
+        hasattr(event, "user_id")
+        and not hasattr(event, "group_id")
         and str(event.user_id) in bot.config.superusers
     ):
         conv["user"] = []

@@ -1,5 +1,4 @@
 from argparse import Namespace
-from nonebot_plugin_manager.manager import Conv
 
 from .plugin import *
 
@@ -74,9 +73,9 @@ def handle_block(args: Namespace) -> str:
     plugin_manager = PluginManager()
 
     if args.is_superuser:
-        plugin = plugin_manager.get_plugin(perm=2)
+        plugin = plugin_manager.get_plugin(perm=6)
     else:
-        plugin = plugin_manager.get_plugin(conv=args.conv, perm=2)
+        plugin = plugin_manager.get_plugin(conv=args.conv, perm=6)
 
     if args.conv["group"]:
         if not args.is_admin:
@@ -123,9 +122,9 @@ def handle_unblock(args: Namespace) -> str:
     plugin_manager = PluginManager()
 
     if args.is_superuser:
-        plugin = plugin_manager.get_plugin(perm=2)
+        plugin = plugin_manager.get_plugin(perm=6)
     else:
-        plugin = plugin_manager.get_plugin(conv=args.conv, perm=2)
+        plugin = plugin_manager.get_plugin(conv=args.conv, perm=6)
 
     if args.conv["group"]:
         if not args.is_admin:
