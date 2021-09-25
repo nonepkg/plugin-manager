@@ -14,7 +14,7 @@ def __get_store_plugin_list() -> dict:
     return store_plugin_list
 
 
-def get_store_pulgin_list() -> Dict[str, bool]:
+def get_store_plugin_list() -> Dict[str, bool]:
     plugin_list = PluginManager().get_plugin()
     result = {}
     for plugin in __get_store_plugin_list():

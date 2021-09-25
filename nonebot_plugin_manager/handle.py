@@ -7,7 +7,7 @@ def handle_ls(args: Namespace) -> str:
     if args.store:
         if args.is_superuser:
             message = "插件商店：\n"
-            plugin = get_store_pulgin_list()
+            plugin = get_store_plugin_list()
         else:
             return "获取插件商店需要超级用户权限！"
     else:
