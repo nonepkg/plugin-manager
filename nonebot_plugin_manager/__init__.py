@@ -27,6 +27,13 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
         "group": [event.group_id] if hasattr(event, "group_id") else [],
     }
 
+    if (
+        isinstance(event, PrivateMessageEvent)
+        and str(event.user_id) in bot.config.superusers
+    ):
+        conv["user"] = []
+        conv["group"] = []
+
     plugin_manager.update_plugin(
         {
             str(p.name): p.name != "nonebot_plugin_manager" and p.matcher
@@ -42,7 +49,7 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
 async def _(bot: Bot, event: MessageEvent, state: T_State):
     args = state["args"]
     args.conv = {
-        "user": [event.user_id] if isinstance(event, PrivateMessageEvent) else [],
+        "user": [event.user_id],
         "group": [event.group_id] if isinstance(event, GroupMessageEvent) else [],
     }
     args.is_admin = (

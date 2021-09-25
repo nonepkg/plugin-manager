@@ -1,4 +1,5 @@
 from argparse import Namespace
+from nonebot_plugin_manager.manager import Conv
 
 from .plugin import *
 
@@ -11,6 +12,12 @@ def handle_ls(args: Namespace) -> str:
         else:
             return "获取插件商店需要超级用户权限！"
     else:
+        if args.conv["group"]:
+            args.conv["user"] = []
+        else:
+            if args.is_superuser:
+                args.conv["user"] = []
+
         if args.user or args.group:
             if args.is_superuser:
                 args.conv = {"user": args.user, "group": args.group}
@@ -19,10 +26,9 @@ def handle_ls(args: Namespace) -> str:
 
         for t in args.conv:
             for i in args.conv[t]:
-                message = f"{'用户' if t == 'user' else '群'}({i}) 的插件列表：\n"
+                message = f"{'用户' if t == 'user' else '群'} {i} 的插件列表：\n"
 
         plugin_manager = PluginManager()
-
         plugin = plugin_manager.get_plugin(args.conv, 1)
         if not args.all:
             plugin = {
@@ -46,14 +52,14 @@ def handle_chmod(args: Namespace) -> str:
         return "设置插件权限需要超级用户权限！"
     else:
         plugin_manager = PluginManager()
-        plugin = plugin_manager.get_plugin(perm=4)
+        plugin = plugin_manager.get_plugin()
 
         if args.all:
-            args.plugin = list(p for p in plugin)
+            args.plugin = list(plugin.keys())
         if args.reverse:
             args.plugin = list(filter(lambda p: p not in args.plugin, plugin))
 
-        # 这里或者 chomod_plugin 里之后应该有个将 r w x 翻译成 4 2 1 的处理
+        # TODO 这里之后应该有个将 r w x 翻译成 4 2 1 的处理
         result = plugin_manager.chmod_plugin(args.plugin, args.mode)
 
         message = "\n".join(
@@ -66,19 +72,27 @@ def handle_chmod(args: Namespace) -> str:
 def handle_block(args: Namespace) -> str:
 
     plugin_manager = PluginManager()
-    plugin = plugin_manager.get_plugin(perm=2)
+
+    if args.is_superuser:
+        plugin = plugin_manager.get_plugin(perm=2)
+    else:
+        plugin = plugin_manager.get_plugin(conv=args.conv, perm=2)
+
+    if args.conv["group"]:
+        if not args.is_admin:
+            return "管理群插件需要群管理员权限！"
+        args.conv["user"] = []
 
     if args.all:
-        args.plugin = list(p for p in plugin)
+        args.plugin = list(plugin.keys())
     if args.reverse:
         args.plugin = list(filter(lambda p: p not in args.plugin, plugin))
 
     result = {}
-    if not args.is_superuser:
-        for p in plugin:
-            if p in args.plugin and not plugin[p]:
-                args.plugin.pop(p)
-                result[p] = False
+    for p in plugin:
+        if p in args.plugin and not plugin[p]:
+            args.plugin.pop(p)
+            result[p] = False
 
     if args.user or args.group:
         if args.is_superuser:
@@ -91,9 +105,9 @@ def handle_block(args: Namespace) -> str:
     message = ""
     for t in args.conv:
         if args.conv[t]:
-            message += "用户" if t == "user" else "群"
+            message += "用户 " if t == "user" else "群 "
             message += ",".join(str(i) for i in args.conv[t])
-    message += "中："
+    message += " 中："
 
     for plugin in result:
         message += "\n"
@@ -107,19 +121,27 @@ def handle_block(args: Namespace) -> str:
 def handle_unblock(args: Namespace) -> str:
 
     plugin_manager = PluginManager()
-    plugin = plugin_manager.get_plugin(perm=2)
+
+    if args.is_superuser:
+        plugin = plugin_manager.get_plugin(perm=2)
+    else:
+        plugin = plugin_manager.get_plugin(conv=args.conv, perm=2)
+
+    if args.conv["group"]:
+        if not args.is_admin:
+            return "管理群插件需要群管理员权限！"
+        args.conv["user"] = []
 
     if args.all:
-        args.plugin = list(p for p in plugin)
+        args.plugin = list(plugin.keys())
     if args.reverse:
         args.plugin = list(filter(lambda p: p not in args.plugin, plugin))
 
     result = {}
-    if not args.is_superuser:
-        for p in plugin:
-            if p in args.plugin and not plugin[p]:
-                args.plugin.pop(p)
-                result[p] = False
+    for p in plugin:
+        if p in args.plugin and not plugin[p]:
+            args.plugin.pop(p)
+            result[p] = False
 
     if args.user or args.group:
         if args.is_superuser:
