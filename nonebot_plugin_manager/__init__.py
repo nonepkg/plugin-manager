@@ -7,11 +7,12 @@ from nonebot.adapters.cqhttp import (
     Bot,
     Event,
     MessageEvent,
-    PrivateMessageEvent,
     GroupMessageEvent,
 )
 
-from .parser import npm_parser, PluginManager
+from .parser import npm_parser
+from .manager import PluginManager
+from .handle import Handle
 
 npm = on_shell_command("npm", parser=npm_parser, priority=1)
 
@@ -61,6 +62,6 @@ async def _(bot: Bot, event: MessageEvent, state: T_State):
     args.is_superuser = str(event.user_id) in bot.config.superusers
 
     if hasattr(args, "handle"):
-        message = args.handle(args)
+        message = getattr(Handle, args.handle)(args)
         if message:
             await bot.send(event, message)
