@@ -6,6 +6,8 @@ from .plugin import *
 class Handle:
     @classmethod
     def ls(cls, args: Namespace) -> str:
+        message = ""
+        
         if args.store:
             if args.is_superuser:
                 message = "插件商店：\n"
