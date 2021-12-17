@@ -119,11 +119,15 @@ class PluginManager:
                     "user": {},
                     "group": {},
                 }
-            else:
+            elif plugin[p] ^ self.__plugin_list[p].get(
+                "status",
+                int(self.__plugin_list[p]["mode"][0]) & 4 == 4,
+            ):
                 self.__plugin_list[p]["mode"] = "".join(
                     str(int(m) | 4 if plugin[p] else int(m) & 3)
                     for m in self.__plugin_list[p]["mode"]
                 )
+            self.__plugin_list[p]["status"] = plugin[p]
         return self
 
     # 移除插件
@@ -139,7 +143,7 @@ class PluginManager:
         return self
 
     # 加载插件列表
-    def __load(self) -> Dict[str, Dict[str, Union[bool, Dict[int, bool]]]]:
+    def __load(self) -> "PluginManager":
         try:
             self.__plugin_list = yaml.safe_load(self.__path.open("r", encoding="utf-8"))
         except:

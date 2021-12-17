@@ -38,7 +38,7 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
 
     plugin_manager.update_plugin(
         {
-            str(p.name): p.name != "nonebot_plugin_manager" and p.matcher
+            str(p.name): p.name != "nonebot_plugin_manager" and bool(p.matcher)
             for p in get_loaded_plugins()
         }
     )
