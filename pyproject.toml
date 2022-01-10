@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot_plugin_manager"
-version = "0.5.5"
+version = "0.5.6"
 description = "Nonebot Plugin Manager base on import hook"
 authors = ["Jigsaw <j1g5aw@foxmail.com>"]
 license = "MIT"
@@ -10,8 +10,8 @@ repository = "https://github.com/Jigsaw111/nonebot_plugin_manager"
 
 [tool.poetry.dependencies]
 python = "^3.7.3"
-nonebot2 = "^2.0.0-alpha.15"
-nonebot-adapter-cqhttp = "^2.0.0-alpha.15"
+nonebot2 = ">=2.0.0-alpha.15, <2.0.0-beta.1"
+nonebot-adapter-cqhttp = ">=2.0.0-alpha.15, <2.0.0-beta.1"
 
 [tool.poetry.dev-dependencies]
 nb-cli = "^0.5.0"
