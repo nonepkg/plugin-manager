@@ -1,9 +1,10 @@
-from nonebot.typing import T_State
+from argparse import Namespace
+from nonebot.params import ShellCommandArgs
 from nonebot.matcher import Matcher
 from nonebot.message import run_preprocessor
 from nonebot.exception import IgnoredException
 from nonebot.plugin import on_shell_command, get_loaded_plugins
-from nonebot.adapters.cqhttp import (
+from nonebot.adapters.onebot.v11 import (
     Bot,
     Event,
     MessageEvent,
@@ -18,7 +19,8 @@ npm = on_shell_command("npm", parser=npm_parser, priority=1)
 
 # 在 Matcher 运行前检测其是否启用
 @run_preprocessor
-async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
+async def _(
+    matcher: Matcher, bot: Bot, event: Event):
 
     plugin_manager = PluginManager()
     plugin = matcher.plugin_name
@@ -48,8 +50,7 @@ async def _(matcher: Matcher, bot: Bot, event: Event, state: T_State):
 
 
 @npm.handle()
-async def _(bot: Bot, event: MessageEvent, state: T_State):
-    args = state["args"]
+async def _(bot: Bot, event: MessageEvent, args: Namespace = ShellCommandArgs()):
     args.conv = {
         "user": [event.user_id],
         "group": [event.group_id] if isinstance(event, GroupMessageEvent) else [],
