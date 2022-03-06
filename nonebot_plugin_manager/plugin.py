@@ -8,7 +8,7 @@ from .manager import PluginManager
 def __get_store_plugin_list() -> dict:
     store_plugin_list = {}
     for plugin in httpx.get(
-        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2@master/docs/.vuepress/public/plugins.json"
+        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/plugins.json"
     ).json():
         store_plugin_list.update({plugin["id"]: plugin})
     return store_plugin_list
