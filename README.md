@@ -107,14 +107,6 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 
 -->
 
-### 导入
-
-`PluginManager`是封装好的插件管理器类，导入后可以直接使用。
-
-```python
-from nonebot_plugin_manager import PluginManager
-```
-
 ## Q&A
 
 - **这是什么？**  
