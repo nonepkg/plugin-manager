@@ -7,19 +7,17 @@ class Handle:
     @classmethod
     def ls(cls, args: Namespace) -> str:
         message = ""
-        
+
         if args.store:
-            if args.is_superuser:
-                message = "插件商店：\n"
-                plugin = get_store_plugin_list()
-            else:
+            if not args.is_superuser:
                 return "获取插件商店需要超级用户权限！"
+            message = "插件商店：\n"
+            plugin = get_store_plugin_list()
         else:
-            if args.conv["group"]:
+            if args.conv["group"]: 
                 args.conv["user"] = []
-            else:
-                if args.is_superuser:
-                    args.conv["user"] = []
+            elif args.is_superuser:
+                args.conv["user"] = []
 
             if args.user or args.group:
                 if args.is_superuser:
@@ -55,23 +53,21 @@ class Handle:
     def chmod(cls, args: Namespace) -> str:
         if not args.is_superuser:
             return "设置插件权限需要超级用户权限！"
-        else:
-            plugin_manager = PluginManager()
-            plugin = plugin_manager.get_plugin()
+        plugin_manager = PluginManager()
+        plugin = plugin_manager.get_plugin()
 
-            if args.all:
-                args.plugin = list(plugin.keys())
-            if args.reverse:
-                args.plugin = list(filter(lambda p: p not in args.plugin, plugin))
+        if args.all:
+            args.plugin = list(plugin.keys())
+        if args.reverse:
+            args.plugin = list(filter(lambda p: p not in args.plugin, plugin))
 
-            # TODO 这里之后应该有个将 r w x 翻译成 4 2 1 的处理
-            result = plugin_manager.chmod_plugin(args.plugin, args.mode)
+        # TODO 这里之后应该有个将 r w x 翻译成 4 2 1 的处理
+        result = plugin_manager.chmod_plugin(args.plugin, args.mode)
 
-            message = "\n".join(
-                f"插件 {p} 的权限成功设置为 {args.mode}！" if result[p] else f"插件 {p} 不存在！"
-                for p in result
-            )
-        return message
+        return "\n".join(
+            f"插件 {p} 的权限成功设置为 {args.mode}！" if result[p] else f"插件 {p} 不存在！"
+            for p in result
+        )
 
     @classmethod
     def block(cls, args: Namespace) -> str:
@@ -114,9 +110,9 @@ class Handle:
                 message += ",".join(str(i) for i in args.conv[t])
         message += " 中："
 
-        for plugin in result:
+        for plugin, value in result.items():
             message += "\n"
-            if result[plugin]:
+            if value:
                 message += f"插件 {plugin} 禁用成功！"
             else:
                 message += f"插件 {plugin} 不存在或已关闭编辑权限！"
@@ -163,9 +159,9 @@ class Handle:
                 message += ",".join(str(i) for i in args.conv[t])
         message += "中："
 
-        for plugin in result:
+        for plugin, value in result.items():
             message += "\n"
-            if result[plugin]:
+            if value:
                 message += f"插件 {plugin} 启用成功！"
             else:
                 message += f"插件 {plugin} 不存在或已关闭编辑权限！"

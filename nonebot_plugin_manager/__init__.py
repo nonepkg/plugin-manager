@@ -1,19 +1,15 @@
 from argparse import Namespace
-from nonebot.params import ShellCommandArgs
+
 from nonebot.matcher import Matcher
+from nonebot.params import ShellCommandArgs
 from nonebot.message import run_preprocessor
 from nonebot.exception import IgnoredException
 from nonebot.plugin import on_shell_command, get_loaded_plugins
-from nonebot.adapters.onebot.v11 import (
-    Bot,
-    Event,
-    MessageEvent,
-    GroupMessageEvent,
-)
+from nonebot.adapters.onebot.v11 import Bot, Event, MessageEvent, GroupMessageEvent
 
+from .handle import Handle
 from .parser import npm_parser
 from .manager import PluginManager
-from .handle import Handle
 
 npm = on_shell_command("npm", parser=npm_parser, priority=1)
 
