@@ -63,6 +63,5 @@ async def _(bot: Bot, event: MessageEvent, args: Namespace = ShellCommandArgs())
     args.is_superuser = str(event.user_id) in bot.config.superusers
 
     if hasattr(args, "handle"):
-        message = getattr(Handle, args.handle)(args)
-        if message:
+        if message := getattr(Handle, args.handle)(args):
             await bot.send(event, message)

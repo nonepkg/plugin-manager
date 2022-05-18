@@ -40,8 +40,7 @@ class PluginManager:
                             can_break = True
                 if can_break:
                     break
-            result[p] = True if mode & perm == perm else False
-        pass
+            result[p] = mode & perm == perm
         return result
 
     # 设置插件模式
@@ -135,10 +134,10 @@ class PluginManager:
         self,
         plugin: Dict[str, bool],
     ) -> "PluginManager":
-        new_plugin_list = {}
-        for p in self.__plugin_list:
-            if p not in plugin:
-                new_plugin_list[p] = self.__plugin_list[p]
+        new_plugin_list = {
+            p: self.__plugin_list[p] for p in self.__plugin_list if p not in plugin
+        }
+
         self.__plugin_list = new_plugin_list
         return self
 
