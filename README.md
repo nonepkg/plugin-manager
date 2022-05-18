@@ -1,5 +1,5 @@
 <div align="center">
-	<img width="200" src="docs/logo.png" alt="logo"></br>
+  <img width="200" src="docs/logo.png" alt="logo"></br>
 
 # Nonebot Plugin Manager
 
@@ -70,40 +70,40 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 **使用前请先确保命令前缀为空，否则请在以下命令前加上命令前缀 (默认为`/`)。**
 
 - `npm ls`查看当前会话插件列表
-- - `-s, --store`互斥参数，查看插件商店列表（仅超级用户可用）
-- - `-u user_id, --user user_id`互斥参数，查看指定用户插件列表（仅超级用户可用）
-- - `-g group_id, --group group_id`互斥参数，查看指定群插件列表（仅超级用户可用）
-- - `-a, --all`可选参数，查看所有插件（包括不含 Matcher 的插件）
+  - `-s, --store`互斥参数，查看插件商店列表（仅超级用户可用）
+  - `-u user_id, --user user_id`互斥参数，查看指定用户插件列表（仅超级用户可用）
+  - `-g group_id, --group group_id`互斥参数，查看指定群插件列表（仅超级用户可用）
+  - `-a, --all`可选参数，查看所有插件（包括不含 Matcher 的插件）
 
 - `npm info 插件名`查询插件信息 （仅超级用户可用）
 
 - `npm chmod mode plugin ...`设置插件权限（仅超级用户可用）
-- - `mode`必选参数，需要设置的权限，参考上文
-- - `plugin...`必选参数，需要设置的插件名
-- - `-a, --all`可选参数，全选插件
-- - `-r, --reverse`可选参数，反选插件
+  - `mode`必选参数，需要设置的权限，参考上文
+  - `plugin...`必选参数，需要设置的插件名
+  - `-a, --all`可选参数，全选插件
+  - `-r, --reverse`可选参数，反选插件
 
 - `npm block plugin...`禁用当前会话插件（需要权限）
-- - `plugin...`必选参数，需要禁用的插件名
-- - `-a, --all`可选参数，全选插件
-- - `-r, --reverse`可选参数，反选插件
-- - `-u user_id ..., --user user_id ...`可选参数，管理指定用户设置（仅超级用户可用）
-- - `-g group_id ..., --group group_id ...`可选参数，管理指定群设置（仅超级用户可用）
+  - `plugin...`必选参数，需要禁用的插件名
+  - `-a, --all`可选参数，全选插件
+  - `-r, --reverse`可选参数，反选插件
+  - `-u user_id ..., --user user_id ...`可选参数，管理指定用户设置（仅超级用户可用）
+  - `-g group_id ..., --group group_id ...`可选参数，管理指定群设置（仅超级用户可用）
 
 - `npm unblock plugin...`启用当前会话插件（需要权限）
-- - `plugin...`必选参数，需要禁用的插件名
-- - `-a, --all`可选参数，全选插件
-- - `-r, --reverse`可选参数，反选插件
-- - `-u user_id ..., --user user_id ...`可选参数，管理指定用户设置（仅超级用户可用）
-- - `-g group_id ..., --group group_id ...`可选参数，管理指定群设置（仅超级用户可用）
+  - `plugin...`必选参数，需要禁用的插件名
+  - `-a, --all`可选参数，全选插件
+  - `-r, --reverse`可选参数，反选插件
+  - `-u user_id ..., --user user_id ...`可选参数，管理指定用户设置（仅超级用户可用）
+  - `-g group_id ..., --group group_id ...`可选参数，管理指定群设置（仅超级用户可用）
 
 <!-- TODO
 
 - `npm install plugin...`安装插件（仅超级用户可用）
-- - `-i index, --index index`指定 PyPI 源
+  - `-i index, --index index`指定 PyPI 源
 
 - `npm uninstall plugin...`卸载插件（仅超级用户可用）
-- - `-a, --all`可选参数，全选插件
+  - `-a, --all`可选参数，全选插件
 
 -->
 
