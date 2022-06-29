@@ -103,15 +103,6 @@ class PluginManager:
         return result
 
     def update_plugin(self, plugin: Dict[str, bool]) -> "PluginManager":
-        other = plugin_manager.__add_plugin(plugin).__remove_plugin(plugin)
-        self.__add_plugin(plugin).__remove_plugin(other.get_plugin(perm=4)).__dump()
-        return self
-
-    # 添加插件
-    def __add_plugin(
-        self,
-        plugin: Dict[str, bool],
-    ) -> "PluginManager":
         for p in plugin:
             if p not in self.__plugin_list:
                 self.__plugin_list[p] = {
@@ -128,18 +119,12 @@ class PluginManager:
                     for m in self.__plugin_list[p]["mode"]
                 )
             self.__plugin_list[p]["status"] = plugin[p]
-        return self
-
-    # 移除插件
-    def __remove_plugin(
-        self,
-        plugin: Dict[str, bool],
-    ) -> "PluginManager":
-        new_plugin_list = {
-            p: self.__plugin_list[p] for p in self.__plugin_list if p not in plugin
-        }
-
-        self.__plugin_list = new_plugin_list
+        for p in self.__plugin_list:
+            if p not in plugin:
+                self.__plugin_list[p]["status"] = False
+                self.__plugin_list[p]["mode"] = "".join(
+                    str(int(m) & 3) for m in self.__plugin_list[p]["mode"]
+                )
         return self
 
     # 加载插件列表
