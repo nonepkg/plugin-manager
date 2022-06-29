@@ -2,7 +2,7 @@ from typing import Dict
 
 import httpx
 
-from .manager import PluginManager
+from .manager import plugin_manager
 
 
 # 获取商店插件列表
@@ -16,7 +16,7 @@ def __get_store_plugin_list() -> dict:
 
 
 def get_store_plugin_list() -> Dict[str, bool]:
-    plugin_list = PluginManager().get_plugin()
+    plugin_list = plugin_manager.get_plugin()
     return {plugin: plugin in plugin_list for plugin in __get_store_plugin_list()}
 
 

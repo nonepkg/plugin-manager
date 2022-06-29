@@ -103,7 +103,7 @@ class PluginManager:
         return result
 
     def update_plugin(self, plugin: Dict[str, bool]) -> "PluginManager":
-        other = PluginManager().__add_plugin(plugin).__remove_plugin(plugin)
+        other = plugin_manager.__add_plugin(plugin).__remove_plugin(plugin)
         self.__add_plugin(plugin).__remove_plugin(other.get_plugin(perm=4)).__dump()
         return self
 
@@ -158,3 +158,6 @@ class PluginManager:
             self.__path.open("w", encoding="utf-8"),
             allow_unicode=True,
         )
+
+
+plugin_manager = PluginManager()

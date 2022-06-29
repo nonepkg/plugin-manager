@@ -14,7 +14,7 @@ class Handle:
             message = "插件商店：\n"
             plugin = get_store_plugin_list()
         else:
-            if args.conv["group"]: 
+            if args.conv["group"]:
                 args.conv["user"] = []
             elif args.is_superuser:
                 args.conv["user"] = []
@@ -29,7 +29,6 @@ class Handle:
                 for i in args.conv[t]:
                     message = f"{'用户' if t == 'user' else '群'} {i} 的插件列表：\n"
 
-            plugin_manager = PluginManager()
             plugin = plugin_manager.get_plugin(args.conv, 1)
             if not args.all:
                 plugin = {
@@ -53,7 +52,6 @@ class Handle:
     def chmod(cls, args: Namespace) -> str:
         if not args.is_superuser:
             return "设置插件权限需要超级用户权限！"
-        plugin_manager = PluginManager()
         plugin = plugin_manager.get_plugin()
 
         if args.all:
@@ -71,9 +69,6 @@ class Handle:
 
     @classmethod
     def block(cls, args: Namespace) -> str:
-
-        plugin_manager = PluginManager()
-
         if args.is_superuser:
             plugin = plugin_manager.get_plugin(perm=6)
         else:
@@ -120,9 +115,6 @@ class Handle:
 
     @classmethod
     def unblock(cls, args: Namespace) -> str:
-
-        plugin_manager = PluginManager()
-
         if args.is_superuser:
             plugin = plugin_manager.get_plugin(perm=6)
         else:

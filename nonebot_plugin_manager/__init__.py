@@ -9,16 +9,13 @@ from nonebot.adapters.onebot.v11 import Bot, Event, MessageEvent, GroupMessageEv
 
 from .handle import Handle
 from .parser import npm_parser
-from .manager import PluginManager
+from .manager import plugin_manager
 
 npm = on_shell_command("npm", parser=npm_parser, priority=1)
 
 # 在 Matcher 运行前检测其是否启用
 @run_preprocessor
-async def _(
-    matcher: Matcher, bot: Bot, event: Event):
-
-    plugin_manager = PluginManager()
+async def _(matcher: Matcher, bot: Bot, event: Event):
     plugin = matcher.plugin_name
 
     conv = {
