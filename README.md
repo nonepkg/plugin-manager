@@ -21,19 +21,19 @@
 - 使用 nb-cli  
 
 ```bash
-nb plugin install nonebot_plugin_manager
+nb plugin install nonebot-plugin-manager
 ```
 
 - 使用 poetry
 
 ```bash
-poetry add nonebot_plugin_manager
+poetry add nonebot-plugin-manager
 ```
 
 - 使用 pip
 
 ```bash
-pip install nonebot_plugin_manager
+pip install nonebot-plugin-manager
 ```
 
 ### 从 GitHub 安装（不推荐）
@@ -60,7 +60,7 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 
 包含 Matcher 的插件默认权限为`755`，不含 Matcher 的插件默认权限为`311`。
 
-> 例：`npm chmod nonebot_plugin_nodice 757`命令可将 nonebot_plugin_nodice 的权限设置为`757`
+> 例：`npm chmod 757 nonebot_plugin_nodice`命令可将 nonebot_plugin_nodice 的权限设置为`757`
 > 即超级用户可写可读可执行，用户可读可执行，群可写可读可执行。
 
 只有超级用户可以修改插件的权限，可以使用绝对模式（八进制数字模式）~~，符号模式~~指定文件的权限。
@@ -71,31 +71,31 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 
 - `npm ls`查看当前会话插件列表
   - `-s, --store`互斥参数，查看插件商店列表（仅超级用户可用）
-  - `-u user_id, --user user_id`互斥参数，查看指定用户插件列表（仅超级用户可用）
-  - `-g group_id, --group group_id`互斥参数，查看指定群插件列表（仅超级用户可用）
+  - `-u <user_id>, --user <user_id>`互斥参数，查看指定用户插件列表（仅超级用户可用）
+  - `-g <group_id>, --group <group_id>`互斥参数，查看指定群插件列表（仅超级用户可用）
   - `-a, --all`可选参数，查看所有插件（包括不含 Matcher 的插件）
 
-- `npm info 插件名`查询插件信息 （仅超级用户可用）
+- `npm info <插件名>`查询插件信息 （仅超级用户可用）
 
-- `npm chmod mode plugin ...`设置插件权限（仅超级用户可用）
+- `npm chmod <mode> <plugin ...>`设置插件权限（仅超级用户可用）
   - `mode`必选参数，需要设置的权限，参考上文
-  - `plugin...`必选参数，需要设置的插件名
+  - `plugin ...`必选参数，需要设置的插件名
   - `-a, --all`可选参数，全选插件
   - `-r, --reverse`可选参数，反选插件
 
-- `npm block plugin...`禁用当前会话插件（需要权限）
-  - `plugin...`必选参数，需要禁用的插件名
+- `npm block <plugin ...>`禁用当前会话插件（需要权限）
+  - `plugin ...`必选参数，需要禁用的插件名
   - `-a, --all`可选参数，全选插件
   - `-r, --reverse`可选参数，反选插件
-  - `-u user_id ..., --user user_id ...`可选参数，管理指定用户设置（仅超级用户可用）
-  - `-g group_id ..., --group group_id ...`可选参数，管理指定群设置（仅超级用户可用）
+  - `-u <user_id ...>, --user <user_id ...>`可选参数，管理指定用户设置（仅超级用户可用）
+  - `-g <group_id ...>, --group <group_id ...>`可选参数，管理指定群设置（仅超级用户可用）
 
-- `npm unblock plugin...`启用当前会话插件（需要权限）
-  - `plugin...`必选参数，需要禁用的插件名
+- `npm unblock <plugin ...>`启用当前会话插件（需要权限）
+  - `plugin ...`必选参数，需要禁用的插件名
   - `-a, --all`可选参数，全选插件
   - `-r, --reverse`可选参数，反选插件
-  - `-u user_id ..., --user user_id ...`可选参数，管理指定用户设置（仅超级用户可用）
-  - `-g group_id ..., --group group_id ...`可选参数，管理指定群设置（仅超级用户可用）
+  - `-u <user_id ...>, --user <user_id ...>`可选参数，管理指定用户设置（仅超级用户可用）
+  - `-g <group_id ...>, --group <group_id ...>`可选参数，管理指定群设置（仅超级用户可用）
 
 <!-- TODO
 
@@ -145,7 +145,5 @@ git clone https://github.com/Jigsaw111/nonebot_plugin_manager.git
 
 - [ ] 无法停用 Matcher 以外的机器人行为（如 APScheduler ）  
   **解决方法：** 暂无
-- [x] 任何人都可以屏蔽/启用插件
-- [x] 如果加载了内置插件将会导致错误
 
 </details>
