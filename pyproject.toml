@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot_plugin_manager"
-version = "0.5.11"
+version = "0.5.12"
 description = "Nonebot Plugin Manager base on import hook"
 authors = ["Jigsaw <j1g5aw@foxmail.com>"]
 license = "MIT"
@@ -20,7 +20,7 @@ black = {version = "^21.9b0", allow-prereleases = true}
 
 [tool.black]
 line-length = 88
-target-version = ["py37", "py38", "py39", "py310"]
+target-version = ["py38", "py39", "py310"]
 include = '\.pyi?$'
 extend-exclude = '''
 '''

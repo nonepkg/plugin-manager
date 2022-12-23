@@ -155,7 +155,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "httpcore"
-version = "0.16.2"
+version = "0.16.3"
 description = "A minimal low-level HTTP client."
 category = "main"
 optional = false
@@ -308,7 +308,7 @@ docker = ["docker-compose (>=1.29.2,<1.30.0)"]
 
 [[package]]
 name = "nonebot-adapter-onebot"
-version = "2.1.5"
+version = "2.2.0"
 description = "OneBot(CQHTTP) adapter for nonebot2"
 category = "main"
 optional = false
@@ -706,8 +706,8 @@ h11 = [
     {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
 ]
 httpcore = [
-    {file = "httpcore-0.16.2-py3-none-any.whl", hash = "sha256:52c79095197178856724541e845f2db86d5f1527640d9254b5b8f6f6cebfdee6"},
-    {file = "httpcore-0.16.2.tar.gz", hash = "sha256:c35c5176dc82db732acfd90b581a3062c999a72305df30c0fc8fafd8e4aca068"},
+    {file = "httpcore-0.16.3-py3-none-any.whl", hash = "sha256:da1fb708784a938aa084bde4feb8317056c55037247c787bd7e19eb2c2949dc0"},
+    {file = "httpcore-0.16.3.tar.gz", hash = "sha256:c5d6f04e2fc530f39e0c077e6a30caa53f1451096120f1f38b954afd0b17c0cb"},
 ]
 httptools = [
     {file = "httptools-0.5.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:8f470c79061599a126d74385623ff4744c4e0f4a0997a353a44923c0b561ee51"},
@@ -953,8 +953,8 @@ nb-cli = [
     {file = "nb_cli-0.6.8.tar.gz", hash = "sha256:c38bb6a5ebd3fed69b604864b6cf17e7f24240d035c87220355802c82e3ed6b0"},
 ]
 nonebot-adapter-onebot = [
-    {file = "nonebot_adapter_onebot-2.1.5-py3-none-any.whl", hash = "sha256:d2a46694c402d5f3c5f6951955a78bbf779e17039d282c612cc1fcff77bc6044"},
-    {file = "nonebot_adapter_onebot-2.1.5.tar.gz", hash = "sha256:e740422cceebc1f0379da788ccddaa7937f7d88c140e2a5ea9ba0e91ddee867e"},
+    {file = "nonebot_adapter_onebot-2.2.0-py3-none-any.whl", hash = "sha256:ad7bfe1f8dc35b3338721590814572632caf7db3fd9c374d08ec51f064953aa2"},
+    {file = "nonebot_adapter_onebot-2.2.0.tar.gz", hash = "sha256:c561009e98af3918c1964332740d86fca16197ed60edf1d16989e781814de377"},
 ]
 nonebot2 = [
     {file = "nonebot2-2.0.0rc2-py3-none-any.whl", hash = "sha256:ec09a1df5b33371d13b80cbe21b975bbf3e6b2caa5d690fac924b1c6aaae6c70"},
