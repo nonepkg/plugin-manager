@@ -59,9 +59,43 @@ async def _(bot: Bot, event: MessageEvent, args: Namespace = ShellCommandArgs())
         message = getattr(Handle, args.handle)(args)
         if message is not None:
             message = message.split("\n")
-            i = 1
-            while len(message) > 30:
-                await bot.send(event, "\n".join(message[:30]) + f"\n【第{i}页】")
-                message = message[31:]
-                i = i + 1
-            await bot.send(event, "\n".join(message[:30]) + "\n【完】")
+            if len(message) > 15:
+                i = 1
+                messages = []
+                while len(message) > 15:
+                    messages.append("\n".join(message[:15]) + f"\n【第{i}页】")
+                    message = message[15:]
+                    i = i + 1
+                messages.append("\n".join(message[:15]) + f"\n【第{i}页-完】")
+                if isinstance(event, GroupMessageEvent):
+                    await bot.send_group_forward_msg(
+                        group_id=event.group_id,
+                        messages=[
+                            {
+                                "type": "node",
+                                "data": {
+                                    "name": "NBPM",
+                                    "uin": bot.self_id,
+                                    "content": msg,
+                                },
+                            }
+                            for msg in messages
+                        ],
+                    )
+                else:
+                    await bot.send_private_forward_msg(
+                        user_id=event.user_id,
+                        messages=[
+                            {
+                                "type": "node",
+                                "data": {
+                                    "name": "NBPM",
+                                    "uin": bot.self_id,
+                                    "content": msg,
+                                },
+                            }
+                            for msg in messages
+                        ],
+                    )
+            else:
+                await bot.send(event, "\n".join(message[:30]))

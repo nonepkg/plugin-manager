@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot_plugin_manager"
-version = "0.5.12"
+version = "0.5.14"
 description = "Nonebot Plugin Manager base on import hook"
 authors = ["Jigsaw <j1g5aw@foxmail.com>"]
 license = "MIT"
@@ -16,7 +16,7 @@ httpx = ">=0.23.1, <1.0.0"
 
 [tool.poetry.dev-dependencies]
 nb-cli = "^0.6.0"
-black = {version = "^21.9b0", allow-prereleases = true}
+black = "^22.12.0"
 
 [tool.black]
 line-length = 88
