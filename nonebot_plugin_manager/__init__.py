@@ -4,14 +4,24 @@ from nonebot.matcher import Matcher
 from nonebot.params import ShellCommandArgs
 from nonebot.message import run_preprocessor
 from nonebot.exception import IgnoredException
-from nonebot.plugin import on_shell_command, get_loaded_plugins
+from nonebot.plugin import PluginMetadata, on_shell_command, get_loaded_plugins
 from nonebot.adapters.onebot.v11 import Bot, Event, MessageEvent, GroupMessageEvent
 
 from .handle import Handle
 from .parser import npm_parser
 from .manager import plugin_manager
 
+__plugin_meta__ = PluginMetadata(
+    name="插件管理器",
+    description="基于 import hook 的插件管理",
+    usage="""看 README""",
+    type="application",
+    homepage="https://github.com/nonepkg/plugin-manager",
+    supported_adapters={"~onebot.v11"},
+)
+
 npm = on_shell_command("npm", parser=npm_parser, priority=1)
+
 
 # 在 Matcher 运行前检测其是否启用
 @run_preprocessor
