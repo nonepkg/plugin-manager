@@ -9,7 +9,7 @@ dependencies = [
     "httpx<1.0.0,>=0.23.1",
 ]
 name = "nonebot_plugin_manager"
-version = "0.5.14"
+version = "0.5.15"
 description = "Nonebot Plugin Manager base on import hook"
 readme = "README.md"
 license = {text = "MIT"}
