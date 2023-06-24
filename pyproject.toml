@@ -7,9 +7,10 @@ dependencies = [
     "nonebot2<3.0.0.0,>=2.0.0",
     "nonebot-adapter-onebot<3.0.0.0,>=2.2.2",
     "httpx<1.0.0,>=0.23.1",
+    "pyyaml>=6.0",
 ]
 name = "nonebot_plugin_manager"
-version = "0.5.15"
+version = "0.5.16"
 description = "Nonebot Plugin Manager base on import hook"
 readme = "README.md"
 license = {text = "MIT"}
