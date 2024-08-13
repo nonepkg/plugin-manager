@@ -1,6 +1,6 @@
 from argparse import Namespace
 
-from .plugin import *
+from .manager import plugin_manager
 
 
 class Handle:
@@ -12,7 +12,6 @@ class Handle:
             if not args.is_superuser:
                 return "获取插件商店需要超级用户权限！"
             message = "插件商店：\n"
-            plugin = get_store_plugin_list()
         else:
             if args.conv["group"]:
                 args.conv["user"] = []
@@ -43,12 +42,6 @@ class Handle:
         return message
 
     @classmethod
-    def info(cls, args: Namespace) -> str:
-        if not args.is_superuser:
-            return "获取插件信息需要超级用户权限！"
-        return get_plugin_info(args.plugin)
-
-    @classmethod
     def chmod(cls, args: Namespace) -> str:
         if not args.is_superuser:
             return "设置插件权限需要超级用户权限！"
@@ -63,7 +56,11 @@ class Handle:
         result = plugin_manager.chmod_plugin(args.plugin, args.mode)
 
         return "\n".join(
-            f"插件 {p} 的权限成功设置为 {args.mode}！" if result[p] else f"插件 {p} 不存在！"
+            (
+                f"插件 {p} 的权限成功设置为 {args.mode}！"
+                if result[p]
+                else f"插件 {p} 不存在！"
+            )
             for p in result
         )
 
