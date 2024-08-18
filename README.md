@@ -42,19 +42,24 @@ pdm add git+https://github.com/nonepkg/plugin-manager
 
 **使用前请先确保命令前缀为空，否则请在以下命令前加上命令前缀 (默认为`/`)。**
 
-- `npm block/disable <plugin ...>`禁用当前会话插件（需要权限）
+- `npm block/disable <plugin ...>`禁用插件（需要权限）
+  - `plugin ...`必选参数，需要禁用的插件名
+  - `-a, --all`可选参数，全选插件
+  - `-r, --reverse`可选参数，反选插件
+  - `-u <user_id ...>, --user <user_id ...>`可选参数，管理指定用户设置（仅超级用户可用）
+  - `-g <group_id ...>, --group <group_id ...>`可选参数，管理指定群设置（仅超级用户可用）
+  - [ ] `-s|--scope`
+
+- `npm unblock/enable <plugin ...>`启用插件（需要权限）
   - `plugin ...`必选参数，需要禁用的插件名
   - `-a, --all`可选参数，全选插件
   - `-r, --reverse`可选参数，反选插件
   - `-u <user_id ...>, --user <user_id ...>`可选参数，管理指定用户设置（仅超级用户可用）
   - `-g <group_id ...>, --group <group_id ...>`可选参数，管理指定群设置（仅超级用户可用）
 
-- `npm unblock/enable <plugin ...>`启用当前会话插件（需要权限）
-  - `plugin ...`必选参数，需要禁用的插件名
-  - `-a, --all`可选参数，全选插件
-  - `-r, --reverse`可选参数，反选插件
-  - `-u <user_id ...>, --user <user_id ...>`可选参数，管理指定用户设置（仅超级用户可用）
-  - `-g <group_id ...>, --group <group_id ...>`可选参数，管理指定群设置（仅超级用户可用）
+- [ ] `npm ban <user ...>`
+- [ ] `npm unban <user ...>`
+  user :ms.at or platform/id
 
 ## 原理
 
@@ -65,7 +70,7 @@ pdm add git+https://github.com/nonepkg/plugin-manager
 ## TODO
 
 - [ ] 新的权限管理
-- [ ] 设置插件别名
+- [ ] 提供自动授予群管理员群内 write 权限的配置项
 
 ## 缺陷
 

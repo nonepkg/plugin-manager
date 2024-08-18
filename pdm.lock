@@ -5,7 +5,7 @@
 groups = ["default", "nonebot", "pre-commit"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:eef8a2709ee6b0cd5be9e721cb2385b41dffaf4e51c94e2b70c3722cf71d2a86"
+content_hash = "sha256:fb71612cba6bb9a66ee8e777df5625365be14d45061e27d87b614b882aa64fd2"
 
 [[package]]
 name = "aiohappyeyeballs"

@@ -1,148 +1,84 @@
-from pathlib import Path
-from typing import Dict, List, Union
+from typing import Optional
 
-import yaml
+from anyio import Path
+from nonebot_plugin_localstore import get_config_dir
+from arclet.cithun import Node, Context, NodeState, PermissionExecutor, context
 
-Conv = Dict[str, List[int]]
+from .perm import DefaultUser as User
+from .perm import DefaultMonitor as Monitor
+
+CONFIG_PATH = get_config_dir(None)
 
 
 class PluginManager:
-    __path: Path
-    __plugin_list: Dict[str, Dict[str, Union[str, Dict[int, int]]]]
+    _path: Path
+    _monitor: Monitor
 
-    def __init__(self, path: Path = Path() / "data" / "manager" / "plugin_list.yml"):
-        self.__path = path
-        self.__load()
+    def __init__(self):
+        self._path = Path(CONFIG_PATH / "plugin_manager.json")
+        self._monitor = Monitor(self._path)
 
-    def get_plugin(
-        self, conv: Conv = {"user": [], "group": []}, perm: Union[str, int] = 5
-    ) -> Dict[str, bool]:
-        """
-        获取指定会话的插件列表
+    def set_realms_admin(self, plugin: str):
+        pass
 
-        参数:
-            `conv: Conv` - 会话列表
-            `perm: Union[str,int]` - 检测权限，满足该条件才返回 True
+    def get_user(self, user_id: str, bot_id: str = "", realm_id: str = "") -> User:
+        user = self._monitor.get_user(user_id)
+        if bot_id:
+            bot = self._monitor.get_group(
+                bot_id, 30, self._monitor.get_group("default", 10)
+            )
+            self._monitor.user_inherit(user, bot)
+        if realm_id:
+            realm = self._monitor.get_group(
+                realm_id, 20, self._monitor.get_group("default", 10)
+            )
+            self._monitor.user_inherit(user, realm)
+        return user
 
-        返回:
-            `Dict[str, bool]`
-        """
-        result = {}
-        type = len(conv["user"]) + len(conv["group"])
-
-        for p in self.__plugin_list:
-            mode = int(self.__plugin_list[p]["mode"][type])
-            for t in conv:
-                can_break = False
-                for i in conv[t]:
-                    if i in self.__plugin_list[p][t]:
-                        mode = int(self.__plugin_list[p][t][i])
-                        if t == "user":
-                            can_break = True
-                if can_break:
-                    break
-            result[p] = mode & perm == perm
-        return result
-
-    # 设置插件模式
-    def chmod_plugin(self, plugin: List[str], mode: str) -> Dict[str, bool]:
-        result = {}
-        for p in plugin:
-            result[p] = False
-            if p in self.__plugin_list:
-                result[p] = True
-                self.__plugin_list[p]["mode"] = mode
-        self.__dump()
-        return result
-
-    # 禁用插件
-    def block_plugin(
-        self,
-        plugin: List[str] = [],
-        conv: Conv = {"user": [], "group": []},
-    ) -> Dict[str, bool]:
-        result = {}
-        for p in plugin:
-            result[p] = False
-            if p in self.get_plugin():
-                result[p] = True
-                for t in conv:
-                    for i in conv[t]:
-                        if i in self.__plugin_list[p][t]:
-                            mode = self.__plugin_list[p][t][i]
-                        else:
-                            mode = int(
-                                self.__plugin_list[p]["mode"][1 if t == "user" else 2]
-                            )
-                        self.__plugin_list[p][t][i] = mode & 6
-
-        self.__dump()
-        return result
-
-    # 启用插件
-    def unblock_plugin(
-        self,
-        plugin: List[str] = [],
-        conv: Conv = {"user": [], "group": []},
-    ) -> Dict[str, bool]:
-        result = {}
-        for p in plugin:
-            result[p] = False
-            if p in self.get_plugin():
-                result[p] = True
-                for t in conv:
-                    for i in conv[t]:
-                        if i in self.__plugin_list[p][t]:
-                            mode = self.__plugin_list[p][t][i]
-                        else:
-                            mode = int(
-                                self.__plugin_list[p]["mode"][1 if t == "user" else 2]
-                            )
-                        self.__plugin_list[p][t][i] = mode | 1
-        self.__dump()
-        return result
-
-    def update_plugin(self, plugin: Dict[str, bool]) -> "PluginManager":
-        for p in plugin:
-            if p not in self.__plugin_list:
-                self.__plugin_list[p] = {
-                    "mode": "755" if plugin[p] else "311",
-                    "user": {},
-                    "group": {},
-                }
-            elif plugin[p] ^ self.__plugin_list[p].get(
-                "status",
-                int(self.__plugin_list[p]["mode"][0]) & 4 == 4,
+    def check_perm(self, plugin: str, user_id: str, realm_id: str, bot_id: str) -> bool:
+        node = Node("/") / plugin
+        owner = self.get_user(user_id, bot_id, realm_id)
+        with context(scope=bot_id):
+            if (
+                repr(Context(scope=bot_id))
+                in (result := PermissionExecutor(owner).get(owner, node)).data
             ):
-                self.__plugin_list[p]["mode"] = "".join(
-                    str(int(m) | 4 if plugin[p] else int(m) & 3)
-                    for m in self.__plugin_list[p]["mode"]
-                )
-            self.__plugin_list[p]["status"] = plugin[p]
-        for p in self.__plugin_list:
-            if p not in plugin:
-                self.__plugin_list[p]["status"] = False
-                self.__plugin_list[p]["mode"] = "".join(
-                    str(int(m) & 3) for m in self.__plugin_list[p]["mode"]
-                )
-        return self
+                return result.most.available
+        with context(scope=realm_id):
+            return PermissionExecutor(owner).get(owner, node).most.available
 
-    # 加载插件列表
-    def __load(self) -> "PluginManager":
-        try:
-            self.__plugin_list = yaml.safe_load(self.__path.open("r", encoding="utf-8"))
-        except:
-            self.__plugin_list = {}
-        return self
+    def _able_plugin(
+        self,
+        plugin: str,
+        executor_id: str,
+        enable: bool,
+        user_id: Optional[str] = None,
+        realm_id: Optional[str] = None,
+        scope: Optional[str] = None,
+    ):
+        node = Node("/") / plugin
+        if executor_id == "root":
+            executor = PermissionExecutor.root
+        else:
+            executor = PermissionExecutor(self.get_user(executor_id))
+        if realm_id:
+            target = self._monitor.get_group(
+                realm_id, 20, self._monitor.get_group("default", 10)
+            )
+        elif user_id:
+            target = self.get_user(user_id)
+        else:
+            raise ValueError("user_id or realm_id must be provided")
+        context_data = {"scope": scope} if scope else {}
+        with context(**context_data):
+            executor.set(target, node, NodeState("v-a" if enable else "v--"))
 
-    # 保存插件列表
-    def __dump(self):
-        self.__path.parent.mkdir(parents=True, exist_ok=True)
-        yaml.dump(
-            self.__plugin_list,
-            self.__path.open("w", encoding="utf-8"),
-            allow_unicode=True,
-        )
+    def init_plugin(self, plugin: str):
+        node = Node("/") / plugin
+        if not node.exists():
+            node.touch()
+        default = self._monitor.get_group("default", 10)
+        PermissionExecutor.root.set(default, node, NodeState("v-a"))
 
 
 plugin_manager = PluginManager()

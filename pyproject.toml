@@ -5,6 +5,7 @@ dependencies = [
     "nonebot2<3.0.0.0,>=2.0.0",
     "nonebot-plugin-alconna>=0.51.1",
     "nonebot-plugin-session>=0.3.2",
+    "nonebot-plugin-localstore>=0.7.1",
 ]
 name = "nonebot-plugin-manager"
 version = "0.1.0"

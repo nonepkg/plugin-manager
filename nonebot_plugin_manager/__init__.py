@@ -1,26 +1,20 @@
-from argparse import Namespace
-
-from nonebot import get_driver
 from nonebot.matcher import Matcher
 from nonebot.adapters import Bot, Event
 from nonebot.message import run_preprocessor
 from nonebot.exception import IgnoredException
-from arclet.alconna import Args, Option, Alconna, Subcommand
+from nonebot import get_driver, get_loaded_plugins
 from nonebot.internal.matcher import matchers as internal_matchers
-from nonebot.plugin import (
-    PluginMetadata,
-    require,
-    get_loaded_plugins,
-    inherit_supported_adapters,
-)
+from nonebot.plugin import PluginMetadata, require, inherit_supported_adapters
+from arclet.alconna import Args, Option, Alconna, MultiVar, Subcommand
 
-from .handle import Handle
-from .manager import plugin_manager
-
+require("nonebot_plugin_localstore")
 require("nonebot_plugin_alconna")
 require("nonebot_plugin_session")
-from nonebot_plugin_session import EventSession
-from nonebot_plugin_alconna import Match, MultiVar, on_alconna
+
+from nonebot_plugin_alconna import Match, Query, on_alconna
+
+from .manager import plugin_manager
+from .params import UserId, RealmId
 
 __plugin_meta__ = PluginMetadata(
     name="新・插件管理器",
@@ -33,21 +27,17 @@ __plugin_meta__ = PluginMetadata(
     ),
 )
 
-block_args = (
+_able_args = (
     Args["plugins", MultiVar(str, "*")],
     Option("-a|--all", default=False),
     Option("-r|--reverse", default=False),
     Option("-u|--user", Args["users", MultiVar(str, "*")]),
     Option("-g|--group", Args["groups", MultiVar(str, "*")]),
 )
-block = Subcommand("block|disable", *block_args, dest="block")
-unblock = Subcommand("unblock|enable", *block_args, dest="unblock")
+enable = Subcommand("enable|unblock", *_able_args, dest="enable")
+disable = Subcommand("disable|block", *_able_args, dest="disable")
 pnpm = on_alconna(
-    Alconna(
-        "pnpm",
-        block,
-        unblock,
-    ),
+    Alconna("pnpm", enable, disable),
     use_cmd_start=True,
     priority=1,
     block=True,
@@ -55,52 +45,85 @@ pnpm = on_alconna(
 )
 
 
-@pnpm.assign("block")
+@pnpm.assign("enable")
+@pnpm.assign("disable")
 async def _(
-    session: EventSession,
     plugins: Match[tuple[str]],
     all: Match[bool],
     reverse: Match[bool],
     users: Match[tuple[str]],
     groups: Match[tuple[str]],
-    event: Event,
+    bot: Bot,
+    user_id: UserId,
+    realm_id: RealmId,
+    enabled: Query[bool] = Query("subcommands.enable.value", False),
 ):
-    args = Namespace()
-    args.is_superuser = True
-    args.is_admin = False
-    args.plugin = plugins.result
-    args.conv = {"user": [session.id1], "group": [session.id2]}
-    args.user = [] if not users.available else users.result
-    args.group = [] if not groups.available else groups.result
-    args.all = all.result if all.available else False
-    args.reverse = reverse.result if reverse.available else False
-    await pnpm.finish(getattr(Handle, "block")(args))
-
-
-# 在 Matcher 运行前检测其是否启用
-@run_preprocessor
-async def _(matcher: Matcher, bot: Bot, event: Event, session: EventSession):
-    plugin = matcher.plugin_id
-
-    conv = {
-        "user": [session.id1] if session.id1 else [],  # type: ignore
-        "group": [session.id2] if session.id2 else [],  # type: ignore
-    }
-
-    plugin_manager.update_plugin(
-        {
-            str(p.id_): p.id_ != __name__ and bool(p.matcher)
-            for p in get_loaded_plugins()
-        }
+    user_id = (
+        "root"
+        if user_id in bot.config.superusers
+        or user_id.split(":", 1)[1] in bot.config.superusers
+        else user_id
     )
+    message = f"在当前上下文中{'启用' if enabled.result else '禁用'}插件的结果：\n"
+    # TODO: refactor
+    for plugin in plugins.result:
+        message += f"- 插件 {plugin}：\n"
+        if not (users.available or groups.available):
+            try:
+                plugin_manager._able_plugin(
+                    plugin,
+                    user_id,
+                    enabled.result,
+                    user_id=user_id,
+                    realm_id=realm_id,
+                    scope=realm_id,
+                )
+                message += f"- - {realm_id or user_id} 成功\n"
+            except Exception as e:
+                message += f"- - {e}\n"
+        for user in users.result if users.available else []:
+            plugin_manager._able_plugin(
+                plugin,
+                user_id,
+                enabled.result,
+                user,
+                scope=realm_id,
+            )
+        for group in groups.result if groups.available else []:
+            plugin_manager._able_plugin(
+                plugin,
+                user_id,
+                enabled.result,
+                realm_id=group,
+                scope=realm_id,
+            )
+    await plugin_manager._monitor.save()
+    await pnpm.finish(message)
 
-    if plugin and not plugin_manager.get_plugin(conv=conv, perm=1)[plugin]:
+
+@run_preprocessor
+async def _(
+    bot: Bot,
+    event: Event,
+    matcher: Matcher,
+    user_id: UserId,
+    realm_id: RealmId,
+):
+    plugin = matcher.plugin_id
+    if plugin is None or plugin == __name__:
+        return
+
+    if not plugin_manager.check_perm(plugin, user_id, realm_id, str(bot.self_id)):
         await bot.send(event, f"无 {plugin} 的使用权限！")
         raise IgnoredException(f"Nonebot Plugin Manager has blocked {plugin} !")
 
 
 @get_driver().on_startup
 async def _():
+    await plugin_manager._monitor.load()
+    for plugin in get_loaded_plugins():
+        plugin_manager.init_plugin(plugin.id_)
+
     # 不許其他插件待在一级优先级
     for priority in reversed(
         range(1, max(priority for priority in internal_matchers) + 1)
