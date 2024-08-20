@@ -62,7 +62,7 @@ class DefaultMonitor(SyncMonitor):
             for group in groups.values():
                 group.inherits = [self.GROUP_TABLE[gp.name] for gp in group.inherits]
             for user in users.values():
-                user.inherits = [self.USER_TABLE[gp.name] for gp in user.inherits]
+                user.inherits = [self.GROUP_TABLE[gp.name] for gp in user.inherits]
             del users, groups
         else:
             await self.save()

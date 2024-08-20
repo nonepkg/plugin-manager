@@ -14,6 +14,11 @@ def _realm_id(session: EventSession) -> str:
     return realm_id
 
 
+def _platform(session: EventSession) -> str:
+    return session.platform
+
+
+Platform = Annotated[str, Depends(_platform)]
 UserId = Annotated[
     str,
     SessionId(

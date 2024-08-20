@@ -2,7 +2,7 @@ from typing import Optional
 
 from anyio import Path
 from nonebot_plugin_localstore import get_config_dir
-from arclet.cithun import Node, Context, NodeState, PermissionExecutor, context
+from arclet.cithun import PE, ROOT, Context, NodeState, context
 
 from .perm import DefaultUser as User
 from .perm import DefaultMonitor as Monitor
@@ -17,9 +17,12 @@ class PluginManager:
     def __init__(self):
         self._path = Path(CONFIG_PATH / "plugin_manager.json")
         self._monitor = Monitor(self._path)
+        self.init_plugin("/")
 
-    def set_realms_admin(self, plugin: str):
-        pass
+    def _op_user(self, user_id: str, scope: str, enable: bool):
+        context_data = {"scope": scope} if scope else {}
+        with context(**context_data):
+            PE.root.set(self.get_user(user_id), ROOT, NodeState("vma"), recursive=True)
 
     def get_user(self, user_id: str, bot_id: str = "", realm_id: str = "") -> User:
         user = self._monitor.get_user(user_id)
@@ -36,16 +39,16 @@ class PluginManager:
         return user
 
     def check_perm(self, plugin: str, user_id: str, realm_id: str, bot_id: str) -> bool:
-        node = Node("/") / plugin
-        owner = self.get_user(user_id, bot_id, realm_id)
+        node = ROOT / plugin
+        owner = self.get_user(user_id)
         with context(scope=bot_id):
             if (
                 repr(Context(scope=bot_id))
-                in (result := PermissionExecutor(owner).get(owner, node)).data
+                in (result := PE(owner).get(owner, node)).data
             ):
                 return result.most.available
         with context(scope=realm_id):
-            return PermissionExecutor(owner).get(owner, node).most.available
+            return PE(owner).get(owner, node).most.available
 
     def _able_plugin(
         self,
@@ -56,11 +59,11 @@ class PluginManager:
         realm_id: Optional[str] = None,
         scope: Optional[str] = None,
     ):
-        node = Node("/") / plugin
+        node = ROOT / plugin
         if executor_id == "root":
-            executor = PermissionExecutor.root
+            executor = PE.root
         else:
-            executor = PermissionExecutor(self.get_user(executor_id))
+            executor = PE(self.get_user(executor_id))
         if realm_id:
             target = self._monitor.get_group(
                 realm_id, 20, self._monitor.get_group("default", 10)
@@ -71,14 +74,17 @@ class PluginManager:
             raise ValueError("user_id or realm_id must be provided")
         context_data = {"scope": scope} if scope else {}
         with context(**context_data):
-            executor.set(target, node, NodeState("v-a" if enable else "v--"))
+            executor.set(
+                target, node, NodeState("v-a" if enable else "v--"), recursive=True
+            )
 
     def init_plugin(self, plugin: str):
-        node = Node("/") / plugin
-        if not node.exists():
-            node.touch()
+        node = ROOT / plugin
         default = self._monitor.get_group("default", 10)
-        PermissionExecutor.root.set(default, node, NodeState("v-a"))
+        if node in default.nodes:
+            return
+        node.touch(exist_ok=True)
+        PE.root.set(default, node, NodeState("v-a"))
 
 
 plugin_manager = PluginManager()
