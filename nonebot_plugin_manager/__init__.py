@@ -48,8 +48,8 @@ _op_args = (
     Args["users", MultiVar(Union[At, str])],
     Option("-g|--group", Args["groups", MultiVar(str, "*")]),
 )
-op = Subcommand("op", *_able_args, dest="op")
-deop = Subcommand("deop", *_able_args, dest="deop")
+op = Subcommand("op", *_op_args, dest="op")
+deop = Subcommand("deop", *_op_args, dest="deop")
 pnpm = on_alconna(
     Alconna("pnpm", enable, disable, ban, unban, op, deop),
     use_cmd_start=True,
@@ -153,7 +153,7 @@ async def _(
 ):
     if (
         user_id not in bot.config.superusers
-        or user_id.split(":", 1)[1] not in bot.config.superusers
+        and user_id.split(":", 1)[1] not in bot.config.superusers
     ):
         await pnpm.finish("无超管权限")
     message = f"在当前上下文中{'设置' if enabled.result else '移除'}管理员的结果：\n"
@@ -199,7 +199,12 @@ async def _():
 
     # 不許其他插件待在一级优先级
     for priority in reversed(
-        range(1, max(priority for priority in internal_matchers) + 1)
+        range(2, max(priority for priority in internal_matchers) + 1)
     ):
+        if priority not in internal_matchers:
+            continue
         internal_matchers[priority + 1] = internal_matchers[priority]
+        del internal_matchers[priority]
+    if m2 := [m for m in internal_matchers[1] if m.plugin_id != __name__]:
+        internal_matchers[2] = m2
     internal_matchers[1] = [m for m in internal_matchers[1] if m.plugin_id == __name__]
